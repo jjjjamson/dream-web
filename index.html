@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>밤편지 — 꿈이 보낸 편지</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0B0D1A;--deep:#10132B;--card:#161930;--card2:#1C1F38;
+  --gold:#C8963E;--gold-light:#E8BC6A;--moonlight:#F0E6CC;
+  --text:#D8D0C4;--text-soft:#A8A095;--muted:#6E6985;
+  --accent:#4A3F7A;--accent-light:#9080D0;
+}
+html{font-size:16px}
+body{
+  background:var(--ink);color:var(--text);
+  font-family:'Noto Sans KR',sans-serif;
+  min-height:100vh;overflow-x:hidden;
+  font-weight:300;letter-spacing:-.005em;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* 배경 */
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d,3s) ease-in-out infinite alternate}
+@keyframes twinkle{0%{opacity:.1;transform:scale(.8)}100%{opacity:.7;transform:scale(1.2)}}
+.moon{position:fixed;top:-80px;right:-80px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle at 40% 40%,#FFF8E7,#C8963E80,transparent 70%);filter:blur(3px);opacity:.16;pointer-events:none;z-index:0}
+
+.app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:1rem 1.4rem 5rem}
+
+/* ===== 네비게이션 ===== */
+.nav-tabs{
+  display:flex;gap:8px;
+  background:rgba(11,13,26,.75);backdrop-filter:blur(14px);
+  border-radius:16px;padding:6px;margin-bottom:1.2rem;
+  position:sticky;top:.5rem;z-index:50;
+  border:1px solid rgba(200,150,62,.2);
+  box-shadow:0 4px 20px rgba(0,0,0,.4);
+}
+.nav-tab{
+  flex:1;padding:.95rem .5rem;
+  font-size:.9rem;text-align:center;border-radius:11px;
+  cursor:pointer;transition:all .25s;
+  font-family:'Noto Sans KR',sans-serif;font-weight:500;
+  border:none;position:relative;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.nav-tab[data-page="page-home"]{background:linear-gradient(135deg,#1F1A40 0%,#1A1830 100%);color:var(--gold-light);border:1px solid rgba(200,150,62,.25)}
+.nav-tab[data-page="page-home"].active{background:linear-gradient(135deg,#C8963E,#A07030);color:#1A1200;font-weight:700;box-shadow:0 4px 16px rgba(200,150,62,.3);border-color:transparent}
+.nav-tab[data-page="page-samples"]{background:linear-gradient(135deg,#2A1F50 0%,#1F1A40 100%);color:#C4B5E0;border:1px solid rgba(112,96,176,.5);animation:pulseGlow 2.8s ease-in-out infinite}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 0 0 rgba(120,90,180,0)}50%{box-shadow:0 0 18px 2px rgba(120,90,180,.35)}}
+.nav-tab[data-page="page-samples"].active{background:linear-gradient(135deg,#7060B0,#4A3F7A);color:#fff;font-weight:700;box-shadow:0 4px 16px rgba(112,96,176,.4);border-color:transparent;animation:none}
+.tab-badge{font-size:.6rem;background:#FF6B6B;color:#fff;padding:1px 6px;border-radius:8px;font-weight:700;letter-spacing:.05em;margin-left:2px}
+.nav-tab[data-page="page-samples"].active .tab-badge{background:#FFC8C8;color:#7A2828}
+
+/* ===== 헤더 ===== */
+header{text-align:center;padding:2rem 0 1.5rem}
+.logo-symbol{font-size:2.4rem;margin-bottom:.6rem;display:block;animation:float 4s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+h1{
+  font-family:'Noto Serif KR',serif;
+  font-size:1.85rem;font-weight:700;
+  color:var(--moonlight);letter-spacing:.03em;
+  margin-bottom:.4rem;line-height:1.2;
+}
+.subtitle{
+  font-size:.78rem;color:var(--muted);
+  letter-spacing:.18em;text-transform:uppercase;
+  font-weight:400;
+}
+.api-status{text-align:center;font-size:.68rem;color:var(--muted);margin-top:.7rem;font-weight:300}
+.api-status .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#5EC87A;margin-right:5px;vertical-align:middle;animation:pulse-dot 2s ease-in-out infinite}
+@keyframes pulse-dot{0%,100%{opacity:.5}50%{opacity:1}}
+.credentials{display:flex;justify-content:center;gap:6px;margin-top:.7rem;flex-wrap:wrap}
+.cred-tag{
+  font-size:.68rem;color:var(--gold);
+  background:rgba(200,150,62,.08);
+  border:1px solid rgba(200,150,62,.25);
+  padding:3px 10px;border-radius:12px;
+  letter-spacing:.02em;font-weight:400;
+}
+
+/* ===== 구분선 ===== */
+.divider{display:flex;align-items:center;gap:14px;margin:1.6rem 0}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:linear-gradient(to right,transparent,rgba(200,150,62,.3),transparent)}
+.divider span{font-size:.7rem;color:var(--gold);letter-spacing:.2em;font-weight:500}
+
+/* ===== 안내 배너 ===== */
+.hint-banner{
+  background:linear-gradient(135deg,rgba(26,21,48,.6),rgba(22,24,46,.6));
+  border:1px solid rgba(200,150,62,.2);
+  border-left:3px solid var(--gold);
+  border-radius:8px;padding:.85rem 1.1rem;margin-bottom:1rem;
+  font-size:.82rem;color:var(--gold-light);
+  line-height:1.65;display:flex;align-items:flex-start;gap:.6rem;
+  font-weight:300;
+}
+.hint-banner::before{content:'💡';flex-shrink:0;font-size:.95rem}
+
+/* ===== 입력 카드 ===== */
+.input-card{
+  background:var(--card);border:1px solid rgba(200,150,62,.25);
+  border-radius:16px;padding:1.4rem;margin-bottom:1rem;
+  box-shadow:0 0 40px rgba(200,150,62,.04);
+}
+.input-label{
+  font-size:.7rem;letter-spacing:.18em;color:var(--gold);
+  text-transform:uppercase;margin-bottom:.85rem;display:block;
+  font-weight:600;
+}
+textarea{
+  width:100%;background:transparent;border:none;outline:none;resize:none;
+  color:var(--moonlight);font-family:'Noto Sans KR',sans-serif;
+  font-size:.95rem;line-height:1.85;min-height:120px;
+  font-weight:300;
+}
+textarea::placeholder{color:var(--muted);font-size:.88rem;line-height:1.75;font-weight:300}
+.char-count{font-size:.72rem;color:var(--muted);text-align:right;margin-top:.6rem;font-weight:300}
+
+.options-row{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
+.option-chip{
+  background:var(--card);border:1px solid rgba(200,150,62,.25);
+  border-radius:20px;padding:.4rem .95rem;font-size:.78rem;
+  color:var(--text-soft);cursor:pointer;transition:all .2s;
+  font-weight:400;
+}
+.option-chip:hover,.option-chip.active{background:rgba(200,150,62,.12);border-color:var(--gold);color:var(--gold)}
+
+.optional-toggle{
+  background:var(--card);border:1px dashed rgba(200,150,62,.3);
+  border-radius:12px;padding:.95rem 1.2rem;
+  font-size:.85rem;color:var(--gold-light);cursor:pointer;
+  margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;
+  transition:all .2s;font-weight:400;
+}
+.optional-toggle:hover{background:rgba(200,150,62,.06)}
+.optional-toggle .arrow{transition:transform .3s}
+.optional-toggle.open .arrow{transform:rotate(180deg)}
+.optional-content{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.optional-content.open{max-height:600px}
+.optional-inner{background:var(--card2);border:1px solid rgba(200,150,62,.2);border-radius:12px;padding:1.1rem;margin-bottom:1rem}
+.field-group{margin-bottom:1.1rem}
+.field-group:last-child{margin-bottom:0}
+.field-label{font-size:.75rem;color:var(--gold);margin-bottom:.6rem;display:block;letter-spacing:.1em;font-weight:500}
+.emotion-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem}
+.emo-chip{background:var(--card);border:1px solid rgba(200,150,62,.2);border-radius:10px;padding:.55rem .3rem;font-size:.78rem;text-align:center;cursor:pointer;color:var(--text-soft);transition:all .2s;font-weight:400}
+.emo-chip:hover{border-color:rgba(200,150,62,.5);color:var(--text)}
+.emo-chip.active{background:rgba(200,150,62,.15);border-color:var(--gold);color:var(--gold-light)}
+.small-input{width:100%;background:var(--card);border:1px solid rgba(200,150,62,.2);border-radius:10px;padding:.7rem .9rem;color:var(--moonlight);font-family:'Noto Sans KR',sans-serif;font-size:.88rem;outline:none;font-weight:300}
+.small-input:focus{border-color:var(--gold)}
+.small-input::placeholder{color:var(--muted);font-size:.82rem}
+
+.disclaimer{
+  font-size:.72rem;color:var(--muted);text-align:center;
+  line-height:1.7;margin:1rem 0 1.2rem;padding:0 .8rem;
+  font-weight:300;
+}
+
+/* ===== 메인 버튼 ===== */
+.btn-main{
+  width:100%;padding:1.15rem;
+  background:linear-gradient(135deg,#C8963E,#A07030);
+  border:none;border-radius:14px;color:#1A1200;
+  font-family:'Noto Serif KR',serif;font-size:1.05rem;font-weight:700;
+  cursor:pointer;letter-spacing:.05em;transition:all .25s;
+  box-shadow:0 4px 24px rgba(200,150,62,.25);
+  position:relative;overflow:hidden;
+}
+.btn-main::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,.15));border-radius:14px}
+.btn-main:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(200,150,62,.4)}
+
+.helper-link{
+  text-align:center;margin-top:1.2rem;padding:.85rem;
+  font-size:.85rem;color:var(--text-soft);cursor:pointer;
+  border:1px dashed rgba(112,96,176,.4);border-radius:10px;
+  background:rgba(74,63,122,.06);transition:all .2s;
+  font-weight:300;line-height:1.5;
+}
+.helper-link:hover{background:rgba(74,63,122,.15);border-color:var(--accent-light);color:#C4B5E0}
+.helper-link strong{color:#C4B5E0;font-weight:500}
+
+/* ===== 로딩 ===== */
+.loading{text-align:center;padding:3rem 1rem;animation:fadeIn .4s ease}
+.loading-orb{width:72px;height:72px;border-radius:50%;background:radial-gradient(circle at 35% 35%,var(--gold-light),var(--gold),#6B4F20);margin:0 auto 1.7rem;animation:pulse-orb 2s ease-in-out infinite}
+@keyframes pulse-orb{0%,100%{box-shadow:0 0 20px rgba(200,150,62,.25),0 0 60px rgba(200,150,62,.06);transform:scale(1)}50%{box-shadow:0 0 40px rgba(200,150,62,.5),0 0 100px rgba(200,150,62,.2);transform:scale(1.06)}}
+.loading-text{font-family:'Noto Serif KR',serif;color:var(--gold-light);font-size:1.05rem;margin-bottom:.6rem;font-weight:500}
+.loading-stage{font-size:.8rem;color:var(--muted);margin-top:.5rem;margin-bottom:1.2rem;min-height:1.2em;transition:opacity .2s;font-weight:300}
+.loading-dots span{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gold);margin:0 3px;animation:dot-bounce 1.4s ease-in-out infinite}
+.loading-dots span:nth-child(2){animation-delay:.2s}
+.loading-dots span:nth-child(3){animation-delay:.4s}
+@keyframes dot-bounce{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* ===== 결과 ===== */
+.result{animation:fadeSlideUp .5s ease}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+.fortune-badge{display:flex;align-items:center;justify-content:center;gap:.7rem;margin-bottom:1.5rem}
+.fortune-label{font-size:.75rem;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;font-weight:400}
+.fortune-value{font-family:'Noto Serif KR',serif;font-size:1.2rem;font-weight:700;padding:.4rem 1.1rem;border-radius:24px;letter-spacing:.02em}
+.gil{background:rgba(94,200,122,.12);color:#5EC87A;border:1px solid rgba(94,200,122,.4)}
+.hyung{background:rgba(232,90,90,.12);color:#E85A5A;border:1px solid rgba(232,90,90,.4)}
+.bo{background:rgba(200,150,62,.12);color:#C8963E;border:1px solid rgba(200,150,62,.4)}
+
+.symbols-row{display:flex;gap:.6rem;margin-bottom:1.2rem;flex-wrap:wrap;justify-content:center}
+.symbol-chip{
+  background:var(--card);border:1px solid rgba(200,150,62,.35);
+  border-radius:24px;padding:.5rem 1.05rem;font-size:.82rem;
+  color:var(--gold-light);font-family:'Noto Serif KR',serif;
+  font-weight:500;letter-spacing:.01em;
+}
+
+/* 꿈 내용 카드 (사용자 본인 입력 노출) */
+.user-dream-card{
+  background:linear-gradient(135deg,rgba(28,31,56,.8),rgba(22,25,48,.8));
+  border:1px solid rgba(200,150,62,.18);
+  border-radius:14px;padding:1.2rem 1.3rem;margin-bottom:1rem;
+}
+.user-dream-label{
+  font-size:.7rem;color:var(--muted);letter-spacing:.15em;
+  text-transform:uppercase;margin-bottom:.7rem;font-weight:500;
+}
+.user-dream-text{
+  font-size:.88rem;line-height:1.9;color:var(--text-soft);
+  font-weight:300;font-style:italic;
+}
+.user-dream-meta{
+  display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.85rem;
+  padding-top:.85rem;border-top:1px dashed rgba(200,150,62,.15);
+}
+.user-meta-item{
+  font-size:.7rem;color:var(--gold-light);
+  background:rgba(200,150,62,.08);border:1px solid rgba(200,150,62,.2);
+  padding:3px 9px;border-radius:8px;font-weight:400;
+}
+
+/* 매칭 상징 */
+.matched-card{
+  background:var(--card);border:1px solid rgba(200,150,62,.25);
+  border-radius:14px;padding:1.2rem 1.3rem;margin-bottom:1rem;
+}
+.matched-title{
+  font-size:.7rem;letter-spacing:.18em;color:var(--gold);
+  text-transform:uppercase;margin-bottom:.85rem;
+  font-weight:600;display:flex;align-items:center;gap:.4rem;
+}
+.matched-item{padding:.7rem 0;border-bottom:1px dashed rgba(200,150,62,.12);font-size:.85rem;line-height:1.65}
+.matched-item:last-child{border-bottom:none;padding-bottom:0}
+.matched-item:first-child{padding-top:0}
+.matched-symbol{color:var(--gold-light);font-weight:500;font-family:'Noto Serif KR',serif;font-size:.95rem}
+.matched-category{font-size:.68rem;color:var(--muted);font-family:'Noto Sans KR';margin-left:.3rem;font-weight:400}
+.matched-meaning{color:var(--text);font-size:.82rem;margin-top:.25rem;opacity:.85;line-height:1.7;font-weight:300}
+
+/* 결과 카드 (핵심 의미 등 짧은 본문) */
+.res-card{
+  background:var(--card);border:1px solid rgba(200,150,62,.2);
+  border-radius:14px;padding:1.3rem 1.4rem;margin-bottom:1rem;
+}
+.res-card-title{
+  font-size:.7rem;letter-spacing:.18em;color:var(--gold);
+  text-transform:uppercase;margin-bottom:.85rem;
+  font-weight:600;display:flex;align-items:center;gap:.5rem;
+}
+.res-card-body{
+  font-size:.95rem;line-height:2;color:var(--text);
+  font-weight:300;
+}
+.res-card-body p{margin-bottom:1.2rem}
+.res-card-body p:last-child{margin-bottom:0}
+
+/* 심층 해석 카드 (강조 - 메인 콘텐츠) */
+.detail-card{
+  background:linear-gradient(135deg,#181B33,#161930);
+  border:1px solid rgba(200,150,62,.35);
+  border-radius:16px;padding:1.5rem 1.5rem;margin-bottom:1rem;
+  position:relative;overflow:hidden;
+  box-shadow:0 4px 24px rgba(200,150,62,.06);
+}
+.detail-card-header{display:flex;align-items:center;gap:.6rem;margin-bottom:1.2rem}
+.detail-card-badge{
+  width:4px;height:18px;background:linear-gradient(180deg,var(--gold),#A07030);
+  border-radius:2px;
+}
+.detail-card-title{
+  font-family:'Noto Serif KR',serif;font-size:1rem;font-weight:600;
+  color:var(--gold-light);letter-spacing:.02em;
+}
+.detail-card-body{
+  font-size:.95rem;line-height:2.05;color:var(--text);
+  font-weight:300;letter-spacing:-.005em;
+}
+.detail-card-body p{margin-bottom:1.3rem}
+.detail-card-body p:last-child{margin-bottom:0}
+
+/* 티저 (블러) */
+.teaser-card{
+  background:linear-gradient(135deg,#181B33,#161930);
+  border:1px solid rgba(200,150,62,.35);border-radius:16px;
+  padding:1.5rem 1.5rem;margin-bottom:1rem;position:relative;overflow:hidden;
+}
+.teaser-visible{font-size:.95rem;line-height:2.05;color:var(--text);font-weight:300;margin-bottom:.6rem}
+.teaser-italic{color:var(--gold-light);font-style:italic;font-size:.88rem;line-height:1.85;margin-top:1rem}
+.teaser-blur-wrap{position:relative;height:140px;overflow:hidden;margin:0 -1.5rem -1.5rem;padding:0 1.5rem}
+.teaser-blur{font-size:.95rem;line-height:2.05;color:var(--text);font-weight:300;filter:blur(5px);user-select:none;pointer-events:none}
+.teaser-fade{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 0%,rgba(22,25,48,.95) 60%,#161930 100%)}
+.teaser-cta-inline{position:absolute;bottom:1.2rem;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#C8963E,#A07030);color:#1A1200;border:none;border-radius:24px;padding:.6rem 1.5rem;font-family:'Noto Serif KR',serif;font-weight:700;font-size:.85rem;cursor:pointer;letter-spacing:.04em;box-shadow:0 4px 20px rgba(200,150,62,.4);white-space:nowrap}
+.teaser-cta-inline:hover{transform:translateX(-50%) translateY(-2px)}
+
+/* 위로 카드 */
+.comfort-card{
+  background:linear-gradient(135deg,rgba(26,37,48,.6),rgba(22,32,40,.6));
+  border:1px solid rgba(94,200,122,.3);
+  border-left:3px solid #5EC87A;
+  border-radius:10px;padding:1.05rem 1.2rem;margin-bottom:1rem;
+  display:flex;gap:.8rem;align-items:flex-start;
+}
+.comfort-icon{font-size:1.4rem;flex-shrink:0;line-height:1}
+.comfort-text{font-size:.88rem;line-height:1.85;color:#A8D8B6;font-weight:300}
+
+/* 행운 아이템 */
+.lucky-row{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.4rem}
+.lucky-tag{
+  background:rgba(200,150,62,.1);border:1px solid rgba(200,150,62,.3);
+  border-radius:20px;padding:.35rem .9rem;font-size:.82rem;
+  color:var(--gold-light);font-weight:400;
+}
+
+/* 페이월 */
+.paywall-hook{
+  background:linear-gradient(135deg,#1F1A40 0%,#16182E 50%,#1A1530 100%);
+  border:1px solid rgba(200,150,62,.45);
+  border-radius:18px;padding:1.8rem 1.4rem;margin-bottom:1rem;
+  text-align:center;position:relative;overflow:hidden;
+  box-shadow:0 0 40px rgba(200,150,62,.1);
+}
+.paywall-hook::before{content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:220px;height:120px;background:radial-gradient(ellipse,rgba(200,150,62,.3),transparent 70%);pointer-events:none}
+.hook-icon{font-size:2.2rem;margin-bottom:.6rem;display:block;position:relative}
+.hook-title{
+  font-family:'Noto Serif KR',serif;font-size:1.35rem;font-weight:700;
+  color:var(--moonlight);margin-bottom:.85rem;line-height:1.45;
+  letter-spacing:-.01em;position:relative;
+}
+.hook-subtitle{
+  font-size:.92rem;color:var(--gold-light);line-height:1.8;
+  margin-bottom:1.3rem;position:relative;font-weight:300;
+}
+.hook-divider{height:1px;background:linear-gradient(to right,transparent,rgba(200,150,62,.4),transparent);margin:1.1rem 0;position:relative}
+.hook-features{display:flex;justify-content:center;gap:1.1rem;flex-wrap:wrap;font-size:.78rem;color:var(--gold-light);font-weight:400}
+
+.urgency-bar{
+  background:rgba(26,16,16,.7);border:1px solid rgba(232,90,90,.35);
+  border-radius:10px;padding:.7rem .95rem;margin-bottom:1rem;
+  font-size:.8rem;color:#E89595;text-align:center;
+  display:flex;align-items:center;justify-content:center;gap:.5rem;
+  font-weight:400;
+}
+.urgency-bar::before{content:'⏰'}
+
+.btn-pay{
+  width:100%;padding:1.2rem;
+  background:linear-gradient(135deg,#C8963E,#A07030);
+  border:none;border-radius:14px;color:#1A1200;
+  font-size:1.08rem;cursor:pointer;
+  font-family:'Noto Serif KR',serif;font-weight:700;
+  letter-spacing:.05em;transition:all .2s;
+  box-shadow:0 4px 20px rgba(200,150,62,.35);
+}
+.btn-pay:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(200,150,62,.5)}
+
+.pay-trust{text-align:center;margin-top:1rem;font-size:.74rem;color:var(--muted);line-height:1.8;font-weight:300}
+.pay-trust-row{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-top:.5rem}
+.pay-trust-item{font-size:.7rem;color:var(--gold);background:rgba(200,150,62,.08);border:1px solid rgba(200,150,62,.25);padding:3px 10px;border-radius:8px;font-weight:400}
+
+/* 공유 버튼 */
+.share-row{display:flex;gap:.6rem;margin-top:1.2rem;flex-wrap:wrap}
+.btn-share{flex:1;min-width:140px;padding:.85rem;background:transparent;border:1px solid rgba(200,150,62,.35);border-radius:12px;color:var(--gold);font-size:.82rem;cursor:pointer;letter-spacing:.03em;transition:all .2s;font-family:'Noto Sans KR',sans-serif;font-weight:400}
+.btn-share:hover{background:rgba(200,150,62,.08);border-color:var(--gold)}
+.btn-share-primary{background:linear-gradient(135deg,#FAE100,#F0D000);border:1px solid rgba(250,225,0,.5);color:#1A1A00;font-weight:600}
+.btn-share-primary:hover{background:linear-gradient(135deg,#FFEC1A,#FAE100);border-color:#FAE100}
+
+.btn-reset{width:100%;margin-top:1rem;padding:.8rem;background:transparent;border:1px solid rgba(200,150,62,.2);border-radius:12px;color:var(--muted);font-size:.82rem;cursor:pointer;transition:all .2s;font-family:'Noto Sans KR',sans-serif;font-weight:400}
+.btn-reset:hover{color:var(--text);border-color:rgba(200,150,62,.45)}
+
+.footer-disclaimer{
+  margin-top:2rem;padding:1rem;text-align:center;
+  font-size:.7rem;color:var(--muted);line-height:1.8;
+  border-top:1px solid rgba(200,150,62,.12);font-weight:300;
+}
+
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid rgba(200,150,62,.4);border-radius:10px;padding:.7rem 1.35rem;font-size:.85rem;color:var(--gold-light);opacity:0;transition:opacity .3s;pointer-events:none;z-index:300;white-space:nowrap;font-weight:400}
+.toast.show{opacity:1}
+
+/* 모달 */
+.modal-overlay{position:fixed;inset:0;background:rgba(11,13,26,.88);backdrop-filter:blur(8px);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:2rem 1rem;overflow-y:auto;animation:fadeIn .3s}
+.modal-overlay.show{display:flex}
+.modal{background:var(--card);border:1px solid var(--gold);border-radius:16px;padding:1.8rem 1.5rem;max-width:480px;width:100%;box-shadow:0 0 80px rgba(200,150,62,.15)}
+.modal-close{background:transparent;border:none;color:var(--muted);font-size:1.6rem;cursor:pointer;float:right;line-height:1;font-weight:300;padding:0;margin-top:-.5rem}
+.modal-close:hover{color:var(--gold-light)}
+
+.error-banner{background:rgba(42,21,21,.6);border:1px solid rgba(232,90,90,.4);border-radius:10px;padding:.85rem 1rem;margin-bottom:1rem;font-size:.85rem;color:#E89595;line-height:1.6;font-weight:300}
+
+/* ===== 샘플 갤러리 ===== */
+.gallery-intro{
+  background:linear-gradient(135deg,rgba(31,26,64,.5),rgba(22,24,46,.5));
+  border:1px solid rgba(112,96,176,.3);border-radius:14px;
+  padding:1.3rem 1.4rem;margin-bottom:1.3rem;text-align:center;
+}
+.gallery-intro-title{font-family:'Noto Serif KR',serif;font-size:1.15rem;color:#C4B5E0;margin-bottom:.5rem;font-weight:600}
+.gallery-intro-sub{font-size:.85rem;color:var(--text-soft);line-height:1.75;font-weight:300}
+.sample-grid{display:flex;flex-direction:column;gap:1rem;margin-bottom:1.2rem}
+.sample-card{
+  background:var(--card);border:1px solid rgba(200,150,62,.25);
+  border-radius:14px;padding:1.3rem 1.35rem;cursor:pointer;
+  transition:all .25s;position:relative;overflow:hidden;
+}
+.sample-card:hover{transform:translateY(-2px);border-color:rgba(200,150,62,.5)}
+.sample-card.theme-gold{background:linear-gradient(135deg,#1F1A30 0%,#2A1F15 100%);border-color:rgba(200,150,62,.45)}
+.sample-card.theme-hyung{background:linear-gradient(135deg,#16182E 0%,#1A1825 100%);border-color:rgba(90,122,160,.35)}
+.sample-card.theme-warm{background:linear-gradient(135deg,#1F1A20 0%,#2A1F1A 100%);border-color:rgba(192,144,96,.4)}
+.sample-card.theme-sky{background:linear-gradient(135deg,#161A2E 0%,#1F2540 100%);border-color:rgba(96,128,176,.4)}
+.sample-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.85rem}
+.sample-nickname{font-size:.82rem;color:var(--muted);letter-spacing:.03em;font-weight:400}
+.sample-badge{font-size:.7rem;padding:4px 11px;border-radius:11px;font-weight:600;letter-spacing:.02em}
+.sample-title{font-family:'Noto Serif KR',serif;font-size:1.15rem;color:var(--moonlight);margin-bottom:.7rem;line-height:1.45;font-weight:600;letter-spacing:-.005em}
+.sample-snippet{font-size:.85rem;color:var(--text-soft);line-height:1.7;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:.85rem;font-weight:300}
+.sample-meta{display:flex;gap:.45rem;flex-wrap:wrap;margin-bottom:.9rem}
+.sample-meta-item{font-size:.72rem;color:var(--gold-light);background:rgba(200,150,62,.1);border:1px solid rgba(200,150,62,.25);padding:3px 9px;border-radius:8px;font-weight:400}
+.sample-cta{display:flex;align-items:center;justify-content:space-between;font-size:.82rem;color:var(--gold);font-weight:500}
+.sample-cta-arrow{font-size:1rem;transition:transform .2s}
+.sample-card:hover .sample-cta-arrow{transform:translateX(4px)}
+
+/* 관리자 */
+.admin-banner{background:linear-gradient(135deg,rgba(58,31,31,.6),rgba(42,21,21,.6));border:1px solid rgba(232,90,90,.35);border-radius:10px;padding:.85rem 1rem;margin-bottom:1rem;font-size:.78rem;color:#E89595;display:flex;align-items:center;gap:.5rem;font-weight:400}
+.admin-banner::before{content:'🔐'}
+.admin-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:.7rem;margin-bottom:1.1rem}
+.stat-card{background:var(--card);border:1px solid rgba(200,150,62,.25);border-radius:12px;padding:1rem 1.1rem}
+.stat-label{font-size:.7rem;color:var(--muted);letter-spacing:.05em;margin-bottom:.35rem;font-weight:400}
+.stat-value{font-size:1.5rem;font-weight:700;color:var(--moonlight);font-family:'Noto Serif KR',serif;line-height:1.1}
+.stat-sub{font-size:.7rem;color:var(--gold);margin-top:.25rem;font-weight:400}
+.admin-section{background:var(--card);border:1px solid rgba(200,150,62,.2);border-radius:12px;padding:1.1rem 1.2rem;margin-bottom:1rem}
+.admin-section-title{font-size:.72rem;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.85rem;font-weight:600}
+.ranking-row{display:flex;align-items:center;gap:.8rem;padding:.5rem 0;border-bottom:1px solid rgba(200,150,62,.1);font-size:.85rem}
+.ranking-row:last-child{border-bottom:none}
+.ranking-num{color:var(--gold);font-family:'Noto Serif KR',serif;font-weight:600;min-width:1.5rem}
+.ranking-name{flex:1;color:var(--text);font-weight:400}
+.ranking-bar-wrap{flex:1.5;background:#0E1124;border-radius:3px;height:6px;position:relative;overflow:hidden}
+.ranking-bar{background:linear-gradient(90deg,#C8963E,#E8BC6A);height:100%;border-radius:3px}
+.ranking-count{color:var(--gold-light);font-size:.76rem;min-width:2.2rem;text-align:right;font-weight:400}
+.log-row{background:#0E1124;border-radius:8px;padding:.7rem .9rem;margin-bottom:.5rem;font-size:.8rem;line-height:1.7}
+.log-meta{font-size:.7rem;color:var(--muted);margin-bottom:.3rem;display:flex;gap:.55rem;flex-wrap:wrap;font-weight:400}
+.log-content{color:var(--text);font-weight:300}
+.btn-admin-action{padding:.6rem 1.2rem;background:transparent;border:1px solid rgba(232,90,90,.35);border-radius:8px;color:#E89595;font-size:.78rem;cursor:pointer;font-family:'Noto Sans KR',sans-serif;margin-top:.6rem;font-weight:400}
+.btn-admin-action:hover{background:rgba(232,90,90,.1)}
+
+.page{display:none}
+.page.active{display:block}
+
+/* ===== 새 푸터 (브랜드 노출 최소화) ===== */
+.app-footer{
+  margin-top:3rem;padding:2rem 0 1rem;
+  border-top:1px solid rgba(200,150,62,.12);
+  text-align:center;
+}
+.app-footer-brand{
+  font-family:'Noto Serif KR',serif;
+  font-size:1rem;color:var(--gold-light);
+  letter-spacing:.05em;margin-bottom:.4rem;font-weight:600;
+}
+.app-footer-tagline{
+  font-size:.7rem;color:var(--muted);
+  letter-spacing:.15em;margin-bottom:1.5rem;
+}
+.app-footer-links{
+  display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;
+  margin-bottom:1.2rem;
+}
+.app-footer-link{
+  font-size:.75rem;color:var(--text-soft);
+  background:none;border:none;cursor:pointer;
+  font-family:'Noto Sans KR',sans-serif;font-weight:400;
+  padding:0;transition:color .2s;
+}
+.app-footer-link:hover{color:var(--gold-light)}
+.app-footer-divider{color:var(--muted);font-size:.7rem}
+.app-footer-copy{
+  font-size:.68rem;color:var(--muted);
+  letter-spacing:.03em;font-weight:300;
+}
+
+/* ===== 정책 페이지 ===== */
+.policy-page{
+  background:var(--card);
+  border:1px solid rgba(200,150,62,.2);
+  border-radius:14px;padding:1.8rem 1.6rem;
+  margin-bottom:1rem;
+}
+.policy-title{
+  font-family:'Noto Serif KR',serif;
+  font-size:1.4rem;color:var(--moonlight);
+  margin-bottom:.4rem;font-weight:700;
+}
+.policy-meta{
+  font-size:.72rem;color:var(--muted);
+  margin-bottom:1.5rem;letter-spacing:.05em;
+}
+.policy-content{
+  font-size:.88rem;line-height:1.95;
+  color:var(--text);font-weight:300;
+}
+.policy-content h2{
+  font-family:'Noto Serif KR',serif;
+  font-size:1.05rem;color:var(--gold-light);
+  margin:1.6rem 0 .6rem;font-weight:600;
+  letter-spacing:.01em;
+}
+.policy-content h2:first-child{margin-top:.5rem}
+.policy-content h3{
+  font-size:.92rem;color:var(--text);
+  margin:1rem 0 .4rem;font-weight:500;
+}
+.policy-content p{margin-bottom:.85rem}
+.policy-content ul, .policy-content ol{
+  margin:.5rem 0 .85rem 1.4rem;
+}
+.policy-content li{margin-bottom:.4rem;line-height:1.85}
+.policy-content strong{color:var(--gold-light);font-weight:500}
+.policy-content table{
+  width:100%;border-collapse:collapse;
+  margin:.8rem 0;font-size:.82rem;
+}
+.policy-content th, .policy-content td{
+  border:1px solid rgba(200,150,62,.2);
+  padding:.55rem .7rem;text-align:left;
+  vertical-align:top;
+}
+.policy-content th{
+  background:rgba(200,150,62,.08);
+  color:var(--gold-light);font-weight:500;
+}
+.policy-placeholder{
+  background:rgba(232,90,90,.08);
+  color:#E89595;padding:0 6px;border-radius:3px;
+  font-size:.85rem;
+}
+.btn-back{
+  background:transparent;border:1px solid rgba(200,150,62,.3);
+  border-radius:10px;padding:.6rem 1.1rem;
+  color:var(--gold);font-size:.8rem;cursor:pointer;
+  margin-bottom:1rem;font-family:'Noto Sans KR',sans-serif;
+  transition:all .2s;
+}
+.btn-back:hover{background:rgba(200,150,62,.08)}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+<div class="moon"></div>
+
+<div class="app">
+
+  <nav class="nav-tabs">
+    <button class="nav-tab active" data-page="page-home" onclick="goPage('page-home')">🌙 내 꿈 해몽</button>
+    <button class="nav-tab" data-page="page-samples" onclick="goPage('page-samples')">📖 샘플 해몽 <span class="tab-badge">무료</span></button>
+  </nav>
+
+  <!-- ============ 홈 ============ -->
+  <div class="page active" id="page-home">
+
+    <header>
+      <span class="logo-symbol">🌙</span>
+      <h1>밤편지</h1>
+      <p class="subtitle">꿈이 보낸 편지</p>
+      <div class="api-status"><span class="dot"></span>실시간 AI 해석</div>
+      <div class="credentials">
+        <span class="cred-tag">한국 전통 해몽</span>
+        <span class="cred-tag">심리학적 분석</span>
+      </div>
+    </header>
+
+    <div id="screen-input">
+      <div class="hint-banner">자세히 설명할수록 더 정확한 해석을 받을 수 있어요. 꿈에서 본 장면, 사람, 감정 등을 구체적으로 적어주세요.</div>
+
+      <div class="input-card">
+        <span class="input-label">꿈 내용</span>
+        <textarea id="dreamText" maxlength="800" placeholder="어젯밤 꿈을 자유롭게 적어주세요.&#10;&#10;예) 어제 새벽 무렵 꿈에서 큰 강을 건너고 있었어요. 물이 차갑고 깊었지만 무섭지는 않았고, 강 건너편에 모르는 사람이 손을 흔들고 있었어요..."></textarea>
+        <div class="char-count"><span id="charCount">0</span>/800</div>
+      </div>
+
+      <div class="options-row">
+        <div class="option-chip" onclick="insertExample(this,'어젯밤 꿈에서 하늘을 자유롭게 날고 있었어요. 처음에는 천천히 떠올랐는데 점점 빨라져서 구름 위를 지나갔어요. 아래를 내려다보니 익숙한 동네가 보였고, 기분은 무척 자유롭고 평온했어요.')">하늘을 나는 꿈</div>
+        <div class="option-chip" onclick="insertExample(this,'커다란 구렁이가 방 안으로 들어오는 꿈을 꿨어요. 처음엔 깜짝 놀랐지만 뱀이 저를 빤히 쳐다보며 가만히 있었고, 색깔은 황금빛이었어요. 무섭다기보다 신비로운 느낌이었어요.')">뱀 꿈</div>
+        <div class="option-chip" onclick="insertExample(this,'몇 년 전 돌아가신 할머니께서 꿈에 나타나셨어요. 환하게 웃으시면서 무언가 말씀하시는데 잘 들리지 않았고, 손을 잡아주셨어요. 깨고 나니 슬프면서도 따뜻한 기분이 남았어요.')">돌아가신 분 꿈</div>
+        <div class="option-chip" onclick="insertExample(this,'이가 우두둑 빠지는 꿈을 꿨어요. 처음에는 한 개가 흔들리더니 입 안 가득 이가 빠졌어요. 피는 나지 않았지만 너무 당황스러웠고 깨고 나서도 한참 기분이 이상했어요.')">이빠지는 꿈</div>
+      </div>
+
+      <div class="optional-toggle" id="optToggle" onclick="toggleOptional()">
+        <span>+ &nbsp;더 정확한 해석을 위한 추가 정보 <span style="color:var(--muted);font-size:.75rem">(선택)</span></span>
+        <span class="arrow">▾</span>
+      </div>
+
+      <div class="optional-content" id="optContent">
+        <div class="optional-inner">
+          <div class="field-group">
+            <label class="field-label">꿈에서 느낀 주된 감정</label>
+            <div class="emotion-grid">
+              <div class="emo-chip" onclick="selectEmo(this,'평온/기쁨','HA')">😌 평온/기쁨</div>
+              <div class="emo-chip" onclick="selectEmo(this,'두려움/불안','AP')">😨 두려움</div>
+              <div class="emo-chip" onclick="selectEmo(this,'슬픔/그리움','SD')">😢 슬픔</div>
+              <div class="emo-chip" onclick="selectEmo(this,'설렘/기대','HA')">💫 설렘</div>
+              <div class="emo-chip" onclick="selectEmo(this,'당황/혼란','CO')">😵 혼란</div>
+              <div class="emo-chip" onclick="selectEmo(this,'분노/짜증','AN')">😤 분노</div>
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">요즘 가장 신경 쓰이는 일 (한 줄)</label>
+            <input type="text" class="small-input" id="lifeContext" placeholder="예: 이직 준비, 연애 고민, 건강 걱정 등" maxlength="50">
+          </div>
+        </div>
+      </div>
+
+      <p class="disclaimer">본 해몽은 재미와 영감을 위한 해석입니다.<br>인생의 중요한 결정은 본인의 판단을 따라주세요.</p>
+
+      <button class="btn-main" onclick="startInterpretation()">🔮 &nbsp;내 꿈 해몽받기</button>
+
+      <div class="helper-link" onclick="goPage('page-samples')">
+        처음이신가요? <strong>실제 해몽 사례 4개 무료로 보기 →</strong>
+      </div>
+    </div>
+
+    <div id="screen-loading" style="display:none">
+      <div class="loading">
+        <div class="loading-orb"></div>
+        <p class="loading-text">꿈의 기운을 읽고 있어요</p>
+        <p class="loading-stage" id="loadingStage">전통 해몽 사전을 참조하는 중...</p>
+        <div class="loading-dots"><span></span><span></span><span></span></div>
+      </div>
+    </div>
+
+    <div id="screen-result" style="display:none"></div>
+
+    <div class="footer-disclaimer">
+      한국 전통 해몽과 심리학적 분석을 결합한 해석을 제공합니다.<br>
+      의학적·법률적·재무적 결정의 근거로 사용하지 마세요.
+    </div>
+  </div>
+
+  <!-- ============ 샘플 ============ -->
+  <div class="page" id="page-samples">
+    <header>
+      <span class="logo-symbol">📖</span>
+      <h1>실제 해몽 사례</h1>
+      <p class="subtitle">Sample Interpretations</p>
+    </header>
+
+    <div class="gallery-intro">
+      <div class="gallery-intro-title">어떻게 풀이되는지 먼저 살펴보세요</div>
+      <div class="gallery-intro-sub">아래는 다른 분들의 꿈을 실제로 해석한 사례입니다.<br>본인 꿈과 가장 가까운 유형을 골라 확인해보세요.</div>
+    </div>
+
+    <div class="sample-grid" id="sampleGrid"></div>
+
+    <div style="background:linear-gradient(135deg,#1A1530,#1F1840);border:1px solid rgba(200,150,62,.45);border-radius:16px;padding:1.6rem 1.4rem;text-align:center;margin-top:1.2rem">
+      <p style="font-family:'Noto Serif KR',serif;font-size:1.2rem;color:var(--moonlight);margin-bottom:.5rem;font-weight:600">샘플을 보셨다면</p>
+      <p style="font-size:.88rem;color:var(--text-soft);line-height:1.75;margin-bottom:1.3rem;font-weight:300">이제 본인의 꿈을 입력하고<br>나만을 위한 해몽을 받아보세요</p>
+      <button class="btn-main" onclick="goPage('page-home')">🔮 내 꿈 해몽받기</button>
+    </div>
+
+    <div class="footer-disclaimer">위 사례들은 본 서비스의 실제 해석 품질을 보여주는 샘플입니다.</div>
+  </div>
+
+  <!-- ============ 관리자 ============ -->
+  <div class="page" id="page-admin">
+    <header>
+      <span class="logo-symbol">🔐</span>
+      <h1>관리자 대시보드</h1>
+      <p class="subtitle">전체 해몽 모니터링</p>
+    </header>
+    <div class="admin-banner">관리자 전용 페이지 · 익명화된 통계만 표시됩니다</div>
+    <div id="adminContent"><div style="text-align:center;padding:2rem;color:var(--muted)">데이터 로딩 중...</div></div>
+    <div class="footer-disclaimer">URL에 #admin을 붙여 접근하세요</div>
+  </div>
+
+  <!-- ============ 이용약관 ============ -->
+  <div class="page" id="page-terms">
+    <button class="btn-back" onclick="goPage('page-home')">← 돌아가기</button>
+    <div class="policy-page">
+      <h1 class="policy-title">이용약관</h1>
+      <p class="policy-meta">시행일: 2026년 1월 1일</p>
+      <div class="policy-content">
+
+        <h2>제1조 (목적)</h2>
+        <p>본 약관은 <span class="policy-placeholder">[(주)○○○○]</span>(이하 "회사")가 제공하는 "밤편지" 서비스(이하 "서비스")의 이용과 관련하여 회사와 이용자의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.</p>
+
+        <h2>제2조 (정의)</h2>
+        <ol>
+          <li><strong>"서비스"</strong>란 회사가 운영하는 밤편지 웹사이트를 통해 제공하는 AI 기반 꿈 해석 콘텐츠 서비스를 의미합니다.</li>
+          <li><strong>"이용자"</strong>란 본 약관에 따라 서비스를 이용하는 모든 자를 의미합니다.</li>
+          <li><strong>"콘텐츠"</strong>란 이용자가 입력한 꿈 내용을 바탕으로 생성된 해석 결과물을 의미합니다.</li>
+        </ol>
+
+        <h2>제3조 (사업자 정보)</h2>
+        <table>
+          <tr><th>상호</th><td><span class="policy-placeholder">[(주)○○○○]</span></td></tr>
+          <tr><th>대표자</th><td><span class="policy-placeholder">[대표자명]</span></td></tr>
+          <tr><th>사업자등록번호</th><td><span class="policy-placeholder">[000-00-00000]</span></td></tr>
+          <tr><th>통신판매업 신고번호</th><td><span class="policy-placeholder">[제0000-○○-0000호]</span></td></tr>
+          <tr><th>사업장 주소</th><td><span class="policy-placeholder">[주소]</span></td></tr>
+          <tr><th>대표 전화</th><td><span class="policy-placeholder">[00-0000-0000]</span></td></tr>
+          <tr><th>대표 이메일</th><td><span class="policy-placeholder">[contact@example.com]</span></td></tr>
+        </table>
+
+        <h2>제4조 (서비스의 제공)</h2>
+        <p>회사는 다음의 서비스를 제공합니다.</p>
+        <ol>
+          <li>꿈 내용 입력 및 기본 해석 무료 제공</li>
+          <li>심층 해석 유료 제공 (1회 결제 ₩1,990)</li>
+          <li>해석 결과 공유 기능</li>
+          <li>기타 회사가 추가로 개발하거나 제공하는 부가 서비스</li>
+        </ol>
+
+        <h2>제5조 (이용요금 및 결제)</h2>
+        <ol>
+          <li>심층 해석은 1회당 ₩1,990(부가세 포함)이며, 결제 즉시 콘텐츠가 제공됩니다.</li>
+          <li>결제는 신용카드, 체크카드, 간편결제(카카오페이, 네이버페이 등) 수단으로 가능합니다.</li>
+          <li>회사는 결제 시스템을 토스페이먼츠 등 외부 결제대행사를 통해 운영합니다.</li>
+        </ol>
+
+        <h2>제6조 (청약 철회 및 환불)</h2>
+        <ol>
+          <li>본 서비스는 "전자상거래 등에서의 소비자보호에 관한 법률" 제17조 제2항 제5호에 따른 디지털 콘텐츠로, 결제 후 심층 해석을 열람한 경우 청약 철회가 제한됩니다.</li>
+          <li>다음의 경우 전액 환불이 가능합니다.
+            <ul>
+              <li>시스템 오류로 콘텐츠가 제공되지 않은 경우</li>
+              <li>결제 직후 콘텐츠를 열람하지 않은 상태에서 7일 이내 환불 요청한 경우</li>
+              <li>회사의 귀책사유로 서비스 제공이 불가능한 경우</li>
+            </ul>
+          </li>
+          <li>환불 요청은 고객센터(<span class="policy-placeholder">[contact@example.com]</span>)로 접수해주시기 바랍니다.</li>
+        </ol>
+
+        <h2>제7조 (이용자의 의무)</h2>
+        <ol>
+          <li>이용자는 다음 행위를 해서는 안 됩니다.
+            <ul>
+              <li>타인의 정보를 도용하여 서비스를 이용하는 행위</li>
+              <li>서비스에서 얻은 정보를 회사의 사전 승낙 없이 복제, 출판, 방송 등으로 이용하거나 제3자에게 제공하는 행위</li>
+              <li>회사의 서비스를 영리 목적으로 무단 이용하는 행위</li>
+              <li>음란, 폭력적, 혐오스러운 내용 등을 입력하는 행위</li>
+            </ul>
+          </li>
+          <li>이용자는 본 서비스의 해석 결과가 재미와 영감을 위한 콘텐츠임을 인지하고, 의학적·법률적·재무적 결정의 근거로 사용하지 않을 책임이 있습니다.</li>
+        </ol>
+
+        <h2>제8조 (회사의 면책)</h2>
+        <ol>
+          <li>본 서비스에서 제공하는 해석은 AI에 의해 자동 생성되는 콘텐츠로, 그 정확성·완전성·유용성에 대해 회사는 어떠한 보증도 하지 않습니다.</li>
+          <li>이용자가 본 서비스의 해석을 신뢰하여 발생한 어떠한 손해에 대해서도 회사는 책임을 지지 않습니다.</li>
+          <li>천재지변, 전쟁, 정전, 시스템 장애 등 불가항력으로 인한 서비스 중단에 대해 회사는 책임을 지지 않습니다.</li>
+        </ol>
+
+        <h2>제9조 (저작권)</h2>
+        <p>서비스를 통해 생성된 해석 결과의 저작권은 회사에 귀속됩니다. 이용자는 개인적 용도로 결과를 열람·저장·공유할 수 있으나, 영리 목적의 재배포는 금지됩니다.</p>
+
+        <h2>제10조 (분쟁 해결)</h2>
+        <ol>
+          <li>본 약관과 관련하여 발생한 분쟁은 회사와 이용자 간에 협의로 해결하는 것을 원칙으로 합니다.</li>
+          <li>협의로 해결되지 않는 분쟁에 대해서는 <span class="policy-placeholder">[관할 법원]</span>을 1심 관할 법원으로 합니다.</li>
+        </ol>
+
+        <h2>부칙</h2>
+        <p>본 약관은 2026년 1월 1일부터 시행됩니다.</p>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 개인정보처리방침 ============ -->
+  <div class="page" id="page-privacy">
+    <button class="btn-back" onclick="goPage('page-home')">← 돌아가기</button>
+    <div class="policy-page">
+      <h1 class="policy-title">개인정보처리방침</h1>
+      <p class="policy-meta">시행일: 2026년 1월 1일</p>
+      <div class="policy-content">
+
+        <p><span class="policy-placeholder">[(주)○○○○]</span>(이하 "회사")는 「개인정보 보호법」 제30조에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 하기 위하여 다음과 같이 개인정보처리방침을 수립·공개합니다.</p>
+
+        <h2>1. 개인정보의 처리 목적</h2>
+        <p>회사는 다음의 목적을 위하여 최소한의 개인정보를 처리합니다.</p>
+        <ul>
+          <li>유료 콘텐츠 결제 및 정산</li>
+          <li>결제 관련 분쟁 조정 및 민원 처리</li>
+          <li>서비스 품질 개선을 위한 통계 분석 (익명화 처리)</li>
+          <li>법령 및 약관에 따른 의무 이행</li>
+        </ul>
+
+        <h2>2. 처리하는 개인정보 항목</h2>
+        <table>
+          <tr><th>구분</th><th>항목</th><th>수집 방법</th></tr>
+          <tr><td>결제 정보</td><td>카드 정보(결제대행사 처리), 결제 이력</td><td>결제 시점</td></tr>
+          <tr><td>서비스 이용 기록</td><td>꿈 입력 내용, 해석 결과, 접속 IP, 브라우저 정보</td><td>서비스 이용 시</td></tr>
+          <tr><td>익명 통계 데이터</td><td>꿈 상징 매칭 빈도, 길흉 비율 등 (개인 식별 불가)</td><td>자동 집계</td></tr>
+        </table>
+
+        <h2>3. 개인정보의 처리 및 보유 기간</h2>
+        <table>
+          <tr><th>처리 항목</th><th>보유 기간</th><th>근거</th></tr>
+          <tr><td>결제 관련 정보</td><td>5년</td><td>전자상거래법</td></tr>
+          <tr><td>전자금융 거래 기록</td><td>5년</td><td>전자금융거래법</td></tr>
+          <tr><td>표시·광고 관련 기록</td><td>6개월</td><td>전자상거래법</td></tr>
+          <tr><td>서비스 이용 기록 (익명)</td><td>3년</td><td>통신비밀보호법</td></tr>
+        </table>
+
+        <h2>4. 개인정보의 제3자 제공</h2>
+        <p>회사는 정보주체의 동의, 법률의 특별한 규정 등 「개인정보 보호법」 제17조에 해당하는 경우에만 개인정보를 제3자에게 제공합니다. 회사는 다음과 같이 결제 처리를 위해 개인정보를 제공합니다.</p>
+        <table>
+          <tr><th>제공받는 자</th><th>제공 목적</th><th>제공 항목</th><th>보유 기간</th></tr>
+          <tr><td>토스페이먼츠(주)</td><td>결제 처리 및 결제 사기 방지</td><td>카드 정보, 결제 금액</td><td>관련 법령에 따른 기간</td></tr>
+        </table>
+
+        <h2>5. 개인정보처리의 위탁</h2>
+        <table>
+          <tr><th>수탁 업체</th><th>위탁 업무</th></tr>
+          <tr><td>Vercel Inc.</td><td>웹 호스팅 및 인프라 서비스</td></tr>
+          <tr><td>Anthropic, PBC</td><td>AI 해석 생성 서비스 (꿈 입력 내용 처리)</td></tr>
+          <tr><td>토스페이먼츠(주)</td><td>결제 처리</td></tr>
+        </table>
+        <p>회사는 위탁 계약 체결 시 「개인정보 보호법」 제26조에 따라 위탁 업무 수행 목적 외 개인정보 처리 금지, 기술적·관리적 보호조치 등을 명시하여 위탁자가 개인정보를 안전하게 처리하는지를 감독하고 있습니다.</p>
+
+        <h2>6. 정보주체의 권리·의무 및 행사 방법</h2>
+        <p>정보주체는 회사에 대해 언제든지 다음 각 호의 개인정보 보호 관련 권리를 행사할 수 있습니다.</p>
+        <ul>
+          <li>개인정보 처리현황 통지 요구</li>
+          <li>개인정보 열람 요구</li>
+          <li>개인정보 정정·삭제 요구</li>
+          <li>개인정보 처리정지 요구</li>
+        </ul>
+        <p>위 권리 행사는 회사에 대해 「개인정보 보호법」 시행령 제41조 제1항에 따라 서면, 전자우편 등을 통하여 하실 수 있으며 회사는 이에 대해 지체 없이 조치하겠습니다.</p>
+
+        <h2>7. 개인정보의 파기</h2>
+        <p>회사는 개인정보 보유기간의 경과, 처리목적 달성 등 개인정보가 불필요하게 되었을 때에는 지체 없이 해당 개인정보를 파기합니다.</p>
+
+        <h2>8. 개인정보의 안전성 확보 조치</h2>
+        <ul>
+          <li>개인정보 취급 직원의 최소화 및 교육</li>
+          <li>개인정보 접근 권한의 제한</li>
+          <li>전송 데이터 암호화 (HTTPS)</li>
+          <li>접속 기록의 보관 및 위변조 방지</li>
+        </ul>
+
+        <h2>9. 개인정보 보호책임자</h2>
+        <table>
+          <tr><th>구분</th><th>내용</th></tr>
+          <tr><td>성명</td><td><span class="policy-placeholder">[보호책임자명]</span></td></tr>
+          <tr><td>직책</td><td><span class="policy-placeholder">[직책]</span></td></tr>
+          <tr><td>연락처</td><td><span class="policy-placeholder">[contact@example.com]</span></td></tr>
+        </table>
+
+        <h2>10. 개인정보처리방침의 변경</h2>
+        <p>이 개인정보처리방침은 시행일로부터 적용되며, 법령 및 방침에 따른 변경 내용의 추가, 삭제 및 정정이 있는 경우에는 변경사항의 시행 7일 전부터 공지사항을 통하여 고지할 것입니다.</p>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 환불정책 ============ -->
+  <div class="page" id="page-refund">
+    <button class="btn-back" onclick="goPage('page-home')">← 돌아가기</button>
+    <div class="policy-page">
+      <h1 class="policy-title">환불정책</h1>
+      <p class="policy-meta">시행일: 2026년 1월 1일</p>
+      <div class="policy-content">
+
+        <h2>1. 디지털 콘텐츠의 특성</h2>
+        <p>밤편지의 심층 해석은 「전자상거래 등에서의 소비자보호에 관한 법률」 제17조 제2항 제5호에 따른 디지털 콘텐츠에 해당합니다. 결제 후 즉시 콘텐츠가 제공되며, 콘텐츠의 특성상 일반 상품과 달리 환불에 제한이 있을 수 있습니다.</p>
+
+        <h2>2. 환불 가능 사유</h2>
+        <p>다음의 경우에는 전액 환불이 가능합니다.</p>
+        <ul>
+          <li><strong>시스템 오류</strong>: 결제는 완료되었으나 시스템 오류로 심층 해석이 제공되지 않은 경우</li>
+          <li><strong>미열람 환불</strong>: 결제 후 심층 해석을 열람하지 않은 상태에서 7일 이내 환불 요청한 경우</li>
+          <li><strong>회사 귀책</strong>: 회사의 귀책사유로 정상적인 서비스 제공이 불가능한 경우</li>
+          <li><strong>이중 결제</strong>: 결제 시스템 오류로 동일 콘텐츠가 2회 이상 결제된 경우</li>
+        </ul>
+
+        <h2>3. 환불 제한 사유</h2>
+        <p>다음의 경우에는 환불이 제한됩니다.</p>
+        <ul>
+          <li>심층 해석을 이미 열람한 경우</li>
+          <li>결제 후 7일이 경과한 경우 (미열람 환불 기준)</li>
+          <li>이용자의 단순 변심에 의한 환불 요청 (콘텐츠 열람 후)</li>
+          <li>이용자의 책임 있는 사유로 콘텐츠가 멸실·훼손된 경우</li>
+        </ul>
+
+        <h2>4. 환불 신청 방법</h2>
+        <ol>
+          <li>환불 요청은 고객센터 이메일(<span class="policy-placeholder">[contact@example.com]</span>)로 접수해주세요.</li>
+          <li>접수 시 다음 정보를 포함해주시기 바랍니다.
+            <ul>
+              <li>결제 일시</li>
+              <li>결제 금액</li>
+              <li>결제 수단 (카드사 등)</li>
+              <li>환불 사유</li>
+            </ul>
+          </li>
+          <li>회사는 영업일 기준 3일 이내 환불 가능 여부를 회신합니다.</li>
+          <li>환불 승인 시 결제 수단에 따라 영업일 기준 3~7일 이내 환불이 완료됩니다.</li>
+        </ol>
+
+        <h2>5. 분쟁 조정</h2>
+        <p>환불 관련 분쟁이 원만히 해결되지 않을 경우 다음 기관에 분쟁 조정을 신청할 수 있습니다.</p>
+        <ul>
+          <li>한국소비자원 (www.kca.go.kr)</li>
+          <li>전자거래분쟁조정위원회 (www.ecmc.or.kr)</li>
+          <li>공정거래위원회 (www.ftc.go.kr)</li>
+        </ul>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 고객센터 ============ -->
+  <div class="page" id="page-support">
+    <button class="btn-back" onclick="goPage('page-home')">← 돌아가기</button>
+    <div class="policy-page">
+      <h1 class="policy-title">고객센터</h1>
+      <p class="policy-meta">언제든 편하게 문의해주세요</p>
+      <div class="policy-content">
+
+        <h2>문의 채널</h2>
+        <p>밤편지 서비스 이용 중 궁금하신 점, 결제 문의, 환불 요청 등은 다음 이메일로 접수해주시기 바랍니다.</p>
+        <table>
+          <tr><th>고객센터 이메일</th><td><span class="policy-placeholder">[contact@example.com]</span></td></tr>
+          <tr><th>응대 시간</th><td>평일 10:00 ~ 18:00 (주말·공휴일 제외)</td></tr>
+          <tr><th>응대 기한</th><td>영업일 기준 3일 이내</td></tr>
+        </table>
+
+        <h2>자주 묻는 질문</h2>
+
+        <h3>Q. 결제는 안 했는데 해석이 나오지 않아요</h3>
+        <p>기본 해석(길흉, 핵심 의미, 매칭 상징)은 무료로 제공됩니다. 페이지를 새로고침하시거나 다시 한 번 시도해주세요. 그래도 같은 증상이 반복되면 이메일로 알려주세요.</p>
+
+        <h3>Q. 결제를 했는데 심층 해석이 안 보여요</h3>
+        <p>결제 완료 후 자동으로 심층 해석이 열립니다. 만약 보이지 않는다면 결제 영수증과 함께 고객센터로 문의해주세요. 시스템 오류로 확인되면 전액 환불 또는 재제공해드립니다.</p>
+
+        <h3>Q. 해석이 너무 일반적이거나 정확하지 않아요</h3>
+        <p>밤편지의 해석은 AI 기반으로 생성되며, 입력하신 꿈의 디테일이 풍부할수록 정확도가 올라갑니다. 꿈 내용을 더 구체적으로 작성하시거나, 감정·요즘 고민 등 선택 정보를 입력해주시면 도움이 됩니다. 본 서비스의 해석은 재미와 영감을 위한 것이며, 인생의 중요한 결정은 본인의 판단을 따라주세요.</p>
+
+        <h3>Q. 환불 받고 싶어요</h3>
+        <p>환불 가능 사유와 절차는 <strong>환불정책</strong> 페이지를 참고해주세요. 디지털 콘텐츠의 특성상 심층 해석을 이미 열람하신 경우 환불이 제한될 수 있습니다.</p>
+
+        <h3>Q. 내가 받은 해석을 친구와 공유하고 싶어요</h3>
+        <p>해석 결과 화면 하단의 공유 버튼을 이용해주세요. 카카오톡 공유, 이미지 저장, 텍스트 복사 등 다양한 방식을 지원합니다. 다만 사생활 보호를 위해 심층 해석 전체가 아닌 길흉 판정과 핵심 의미까지만 공유됩니다.</p>
+
+      </div>
+    </div>
+  <!-- ===== 공통 푸터 ===== -->
+  <footer class="app-footer" id="appFooter" style="display:block">
+    <div class="app-footer-brand">밤편지</div>
+    <div class="app-footer-tagline">꿈이 보낸 편지</div>
+    <div class="app-footer-links">
+      <button class="app-footer-link" onclick="goPage('page-terms')">이용약관</button>
+      <span class="app-footer-divider">·</span>
+      <button class="app-footer-link" onclick="goPage('page-privacy')">개인정보처리방침</button>
+      <span class="app-footer-divider">·</span>
+      <button class="app-footer-link" onclick="goPage('page-refund')">환불정책</button>
+      <span class="app-footer-divider">·</span>
+      <button class="app-footer-link" onclick="goPage('page-support')">고객센터</button>
+    </div>
+    <div class="app-footer-copy">© 2026 밤편지. All rights reserved.</div>
+  </footer>
+
+</div>
+
+<!-- 푸터를 .app 외부에 둔 기존 코드 제거 (위로 이동됨) -->
+
+<div class="modal-overlay" id="modalFull">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<div id="shareCardWrap" style="position:fixed;top:-9999px;left:-9999px;width:480px;background:#0B0D1A;padding:2.2rem 1.8rem;font-family:'Noto Sans KR',sans-serif">
+  <div id="shareCard"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const KOREAN_DREAM_KB = `한국 전통 해몽 + 심리학 통합 지식
+
+## A. 동물
+뱀(황금빛=재물·지혜 최상길몽, 검은색=경고), 돼지(금전운 길몽), 용(최상길몽), 호랑이(권력·태몽), 고양이(여성성·비밀), 개(충성·갈등), 물고기(재물·태몽), 새(자유·소식), 거북이(장수·재물), 닭(시작), 소(부·노력), 말(출세·이동)
+
+## B. 자연
+맑은물(재물·정화), 탁한물(혼란), 불(열정·변화), 산(도전), 바다(큰변화), 강(흐름·전환), 비(정화), 해(성공·희망), 달(직감·여성성), 별(인연), 나무(생명력), 꽃(사랑)
+
+## C. 신체
+이빠짐(변화·근심, 피X면 액땜, 윗니=윗사람), 머리카락(건강·인연), 피(역설적 길몽-재물), 똥(재물·횡재 길몽), 임신(새시작), 죽음(변화·재생), 결혼(결합)
+
+## D. 인물
+돌아가신분(조상의 메시지·보호, 웃음=길), 아기(새시작), 모르는사람(새인연·내면의 또 다른 나), 옛연인(미해결감정), 가족(현재관계)
+
+## E. 행동
+하늘날기(자유·승진·해방), 떨어짐(통제상실 두려움, 가벼우면 액땜), 쫓김(회피중 문제), 길잃음(방향상실), 시험(평가불안), 우는꿈(역설-슬픔해소)
+
+## F. 장소
+자기집(자아·현재상태), 학교(어린시절미해결), 직장(책임·부담), 화장실(정화·재물), 결혼식장(결합), 장례식장(끝·재생), 병원(회복필요)
+
+## G. 해석 원칙
+1. 사용자의 감정·요즘 고민 반영해 같은 상징도 다르게 해석
+2. 한국 전통 의미 우선, 심리학적 풀이로 보강
+3. 흉몽은 "옛 어른들이 액땜이라 부르던 꿈" 개념으로 위로
+4. 꿈 텍스트의 구체 단어를 해석에 직접 인용
+5. 단정 어투 금지`;
+
+const SAMPLES = [
+  {
+    id:1,theme:'gold',nickname:'민지님',title:'황금구렁이가 손목을 감았어요',
+    badge:'✨ 길몽',badgeColor:'#5EC87A',badgeBg:'rgba(94,200,122,.12)',
+    snippet:'새벽에 꾼 꿈이었어요. 우리 집 거실에 황금빛으로 빛나는 큰 구렁이가 또아리를 틀고 있었어요...',
+    emotion:'😌 설렘/기대',lifeContext:'이직 결정',
+    dream:'새벽에 꾼 꿈이었어요. 우리 집 거실에 황금빛으로 빛나는 큰 구렁이가 또아리를 틀고 있었어요. 처음엔 깜짝 놀랐는데 뱀이 저를 빤히 쳐다보면서도 전혀 위협적이지 않았고, 오히려 저를 기다린 것처럼 느껴졌어요. 제가 가까이 다가갔더니 뱀이 천천히 제 손목을 감았는데 무겁지 않고 따뜻했어요. 그 순간 거실 창문으로 햇빛이 쏟아져 들어와서 뱀 비늘이 더 반짝였고, 저는 이상하게 마음이 평온했어요.',
+    matched:[
+      {symbol:'황금 구렁이',category:'동물',meaning:'재물과 지혜의 최상급 길몽'},
+      {symbol:'거실(자기 집)',category:'장소',meaning:'변화가 본인 중심에서 시작됨'},
+      {symbol:'햇빛',category:'자연',meaning:'양기와 성공의 도래'}
+    ],
+    symbols:['황금 구렁이','집 거실','쏟아지는 햇빛'],
+    summary:'황금빛 구렁이가 집 안에서 평온하게 감겨오는 꿈은 옛부터 가장 강력한 길몽 중 하나로 전해집니다. 큰 재물이나 기회가 본인에게 다가오고 있다는 신호이며, 특히 이직을 고민 중인 시점에 꾼 점이 의미심장합니다.',
+    detail:`이 꿈은 한국 전통 해몽에서 가장 강력한 길몽 중 하나로 손꼽히는 유형입니다. 뱀, 그 중에서도 황금빛을 띤 구렁이는 옛부터 '재물의 신'이 거하는 동물로 여겨졌습니다. 단순히 돈이 들어온다는 의미를 넘어, 본인의 인생 흐름 자체가 풍요로운 단계로 진입한다는 큰 변화의 전조로 해석됩니다. 특히 뱀의 색깔이 검거나 어둡지 않고 황금빛이었다는 점, 그리고 뱀이 위협적이지 않고 오히려 따뜻하게 느껴졌다는 점은 이 길몽의 등급을 한층 더 끌어올리는 결정적 요소입니다.
+
+심리학적으로 보면 뱀은 '변화'의 가장 오래된 상징으로 여겨집니다. 허물을 벗으며 새로워지는 뱀의 속성은 우리 마음이 옛 모습을 벗고 새로운 단계로 도약하는 순간을 비유적으로 보여줍니다. 민지님의 꿈에서 뱀이 손목을 감은 것은 무엇을 빼앗기는 행위가 아니라, 새로운 운명이 본인에게 '연결'되는 상징적 순간입니다. 이런 꿈은 인생의 큰 전환점에서 본인의 결정이 올바른 방향임을 마음 깊은 곳에서 강력하게 확인해주는 신호로 자주 해석됩니다.
+
+요즘 이직을 고민하고 계신 맥락과 이 꿈을 함께 놓고 보면 그 메시지는 더욱 또렷해집니다. 꿈의 배경이 외부 장소가 아니라 '본인의 집 거실'이었다는 점, 그리고 햇빛이 창문으로 쏟아져 들어왔다는 점은 변화의 방향이 외부에서 강요된 것이 아니라, 본인이 주도권을 쥔 채로 자연스럽게 펼쳐지는 흐름임을 보여줍니다. 마음 깊은 곳은 지금 이 결정에 대해 두려워하지 말라고, 그리고 망설이지 말라고 말하고 있습니다. 햇빛이 쏟아져 들어왔다는 디테일은 결정 이후의 전망 자체가 밝다는 부가적 신호입니다.
+
+앞으로 이렇게 행동해보시기를 권합니다. 첫째, 지금 고민 중인 이직 결정에 대해 더 이상 정보를 모으며 미루지 마세요. 마음은 이미 답을 알고 있고 그 방향을 향해 가라고 말하고 있습니다. 이번 주 안에 결단을 내리시는 것이 흐름과 가장 잘 맞습니다. 둘째, 결정 후 한 달 안에 본인이 평소 만나지 않던 사람과의 자리를 한 번 만들어보세요. 황금뱀이 손목에 감겼다는 것은 단순한 재물뿐 아니라 '귀인(貴人)'과의 만남도 함께 의미합니다. 셋째, 이 꿈을 꾼 시점부터 약 3개월 이내에 들어오는 제안에 평소보다 더 열린 마음으로 응답해보세요. 평소 같으면 거절했을 작은 기회 안에 진짜 행운이 숨어 있을 가능성이 큽니다.
+
+마지막으로 기억해주세요. 길몽은 보장이 아니라 가능성입니다. 황금뱀이 손목을 감았다는 것은 운이 본인에게 '도착'했다는 뜻이지, 가만히 있어도 모든 것이 풀린다는 뜻은 아닙니다. 꿈이 보낸 신호를 본인의 행동으로 이어가실 때, 이 길몽은 비로소 완성됩니다.`,
+    comfort:'',lucky:['황금색','동쪽','숫자 8','이른 아침']
+  },
+  {
+    id:2,theme:'hyung',nickname:'준호님',title:'이가 우두둑 빠지는 꿈을 꿨어요',
+    badge:'🌫️ 흉몽',badgeColor:'#E85A5A',badgeBg:'rgba(232,90,90,.12)',
+    snippet:'어젯밤 꿈에서 이가 우두둑 빠지는 꿈을 꿨어요. 처음에는 윗니 하나가 흔들리더니...',
+    emotion:'😨 두려움/불안',lifeContext:'부모님 건강',
+    dream:'어젯밤 꿈에서 이가 우두둑 빠지는 꿈을 꿨어요. 처음에는 윗니 하나가 흔들리더니, 손으로 만져보니까 또 다른 이가 흔들리고, 결국 입 안 가득 이가 빠져서 손바닥에 가득 모였어요. 피는 나지 않았는데 빠진 이를 보면서 너무 당황스럽고 두려웠어요. 깨고 나서도 한참 동안 가슴이 답답하고 기분이 이상했어요. 혹시 가족 중에 누가 안 좋은 일이 생기는 건 아닌지 걱정이 됩니다.',
+    matched:[
+      {symbol:'이가 빠짐',category:'신체',meaning:'변화·근심의 신호, 피가 없으면 강도 약화'},
+      {symbol:'윗니가 먼저 흔들림',category:'신체',meaning:'윗사람(부모·어른) 관련 걱정의 표출'},
+      {symbol:'손바닥에 모인 이',category:'신체',meaning:'마음이 걱정을 한곳에 정리하는 상징'}
+    ],
+    symbols:['빠지는 이','윗니의 흔들림','손바닥의 정리'],
+    summary:'이가 빠지는 꿈은 표면적으로는 불안하지만, 한국 전통 해몽에서는 오히려 다가올 걱정을 미리 흘려보내는 "액땜의 꿈"으로 자주 해석됩니다. 특히 피가 나지 않은 것은 흉의 강도가 약하다는 결정적 신호입니다.',
+    detail:`이가 빠지는 꿈은 한국에서 가장 많이 꾸고 가장 많이 검색되는 꿈 중 하나입니다. 표면적으로는 분명히 불안한 인상을 주지만, 옛 어른들은 이런 꿈을 두고 오히려 "액땜했다"며 안도하셨습니다. 한국 전통 해몽에서 이가 빠지는 꿈은 '근심의 흘려보냄'으로 분류되는데, 현실에서 일어날 수도 있었던 부정적 일들을 꿈이 대신 받아 흘려보냈다는 의미를 가집니다. 즉, 이 꿈을 꿨다는 사실 자체가 액운을 미리 정리했다는 뜻이기도 합니다. 특히 준호님의 꿈에서 피가 전혀 나지 않았다는 점은 매우 중요한 디테일입니다. 옛 해몽에서 피가 동반되지 않은 이빠짐은 흉의 강도가 현저히 약해진다고 전해집니다.
+
+심리학적으로 보면 이가 빠지는 꿈은 '통제 상실의 두려움'이 표현되는 가장 보편적인 방식입니다. 이는 입 안에 단단히 박혀 있어야 할 것이 빠져나간다는 신체 감각으로, 우리 마음이 어떤 상황에 대해 충분히 통제하지 못하고 있다고 느낄 때 자주 나타납니다. 다만 중요한 것은 이 감정이 '현실의 실제 위협'을 반영하는 게 아니라, 마음이 미리 걱정을 '예행연습'하는 과정이라는 점입니다. 즉 진짜 나쁜 일이 일어난다는 예고가 아니라, 마음이 불안을 다루는 자기치유의 메커니즘인 셈입니다.
+
+요즘 부모님 건강을 신경 쓰고 계신 맥락과 함께 보면 이 꿈의 메시지는 더욱 분명해집니다. 꿈에서 윗니가 먼저 흔들렸다는 디테일은 한국 전통 해몽에서 윗사람, 특히 부모나 어른에 대한 걱정과 연결됩니다. 다만 이것은 부모님께 무슨 일이 생긴다는 예고가 아니라, 준호님의 마음속에 부모님을 향한 걱정이 평소보다 깊이 자리잡고 있다는 신호입니다. 빠진 이가 손바닥에 가득 모였다는 장면은 마음이 그 걱정들을 한곳에 정리해서 본인에게 보여주려 했다는 뜻으로 해석할 수 있습니다.
+
+앞으로 이렇게 행동해보시기를 권합니다. 첫째, 이번 주 안에 부모님께 한 번 전화를 드리거나 직접 안부를 묻는 시간을 가져보세요. 꿈이 알려준 마음속 걱정은 행동으로 해소될 때 가장 빨리 가라앉습니다. 둘째, 부모님의 정기검진이나 건강 점검이 미뤄져 있다면 이번 달 안에 일정을 잡아보세요. 꿈은 종종 우리가 미루어둔 일을 떠올리게 해주는 역할을 하는데, 이 꿈도 그런 알림일 가능성이 큽니다. 셋째, 본인의 마음도 함께 돌보세요. 가족 걱정에 빠져 정작 본인이 충분히 쉬지 못하고 있다면, 이 꿈은 본인에게도 "조금 쉬어가라"는 메시지를 보내고 있습니다.
+
+무엇보다 기억해주세요. 흉몽이라 불리는 꿈은 실제로는 본인을 보호하는 꿈인 경우가 훨씬 많습니다. 꿈은 본인의 적이 아니라, 본인 안의 가장 지혜로운 부분이 보내는 편지입니다. 오늘 꾼 이 꿈은 두려워해야 할 신호가 아니라, 사랑하는 사람을 한 번 더 떠올리고 챙기라는 다정한 알림일 가능성이 가장 큽니다.`,
+    comfort:'옛 어른들은 이런 꿈을 두고 "액땜했다"며 오히려 안심하셨답니다. 마음이 미리 걱정을 흘려보내고 있다는 좋은 신호예요.',
+    lucky:['짙은 남색','북쪽','숫자 7','해 질 무렵']
+  },
+  {
+    id:3,theme:'warm',nickname:'수진님',title:'돌아가신 외할머니께서 콩국수를 주셨어요',
+    badge:'🌀 보통',badgeColor:'#C8963E',badgeBg:'rgba(200,150,62,.12)',
+    snippet:'몇 년 전 돌아가신 외할머니께서 꿈에 나타나셨어요. 어릴 적 자주 갔던 시골집 마루에 앉아 계셨는데...',
+    emotion:'😢 슬픔/그리움',lifeContext:'번아웃, 지친 마음',
+    dream:'몇 년 전 돌아가신 외할머니께서 꿈에 나타나셨어요. 어릴 적 자주 갔던 시골집 마루에 앉아 계셨는데, 환하게 웃으시면서 제가 좋아하던 콩국수를 한 그릇 내주셨어요. 무언가 말씀하시는 것 같았는데 말소리가 잘 들리지 않았고, 그저 손을 꼭 잡아주시며 등을 토닥여 주셨어요. 깨고 나니 베개가 젖어 있었고, 슬프면서도 이상하게 따뜻한 기분이 한참 남았어요. 한동안 할머니 생각을 안 하고 살았는데 갑자기 꿈에 나타나신 게 의아해요.',
+    matched:[
+      {symbol:'돌아가신 외할머니',category:'인물',meaning:'조상의 메시지와 보호의 신호'},
+      {symbol:'시골집 마루',category:'장소',meaning:'마음이 가장 안전했던 시절로의 회귀'},
+      {symbol:'콩국수(좋아하던 음식)',category:'상징',meaning:'결핍된 보살핌에 대한 호명'},
+      {symbol:'등을 토닥임',category:'행동',meaning:'위로와 인정의 직접적 전달'}
+    ],
+    symbols:['웃으시는 할머니','콩국수 한 그릇','따뜻한 토닥임'],
+    summary:'돌아가신 할머니께서 환하게 웃으며 음식을 내어주고 등을 토닥여 주신 꿈은 한국 전통 해몽에서 "조상의 보호"와 "따뜻한 메시지"의 대표적 사례로 전해집니다. 한동안 잊고 지내던 분이 갑자기 나타나신 건 분명한 이유가 있는 신호입니다.',
+    detail:`한국 전통 해몽에서 돌아가신 분이 환하게 웃으시며 나타나는 꿈은 가장 따뜻한 종류의 신호로 분류됩니다. 옛 어른들은 이런 꿈을 두고 "조상이 지켜보고 계신다", "보호해 주신다"는 의미로 받아들였습니다. 특히 그분이 슬퍼하거나 어두운 표정이 아니라 환하게 웃으셨다는 점, 그리고 본인이 좋아하던 음식을 직접 내어주셨다는 점은 이 꿈이 단순한 그리움의 발현이 아니라 '의도된 방문'에 가깝다는 강한 시그널입니다. 옛 해몽에서는 이런 꿈을 꾼 사람에게 가까운 시일 내에 마음이 풀리거나 좋은 변화가 찾아온다고 전합니다.
+
+심리학적으로 보면 이런 꿈은 '내면의 보살핌'이 부족한 시기에 마음이 스스로를 위로하기 위해 만들어내는 가장 강력한 장면 중 하나로 알려져 있습니다. 우리 마음 깊은 곳에는 어린 시절에 받았던 무조건적인 사랑의 기억이 저장되어 있는데, 현재 본인이 충분히 보살핌받지 못하고 있다고 느낄 때 그 기억이 꿈으로 호출됩니다. 외할머니께서 등장하셨다는 것은 단순히 그분을 그리워한다는 의미가 아니라, 그분이 상징하는 '조건 없는 사랑'을 지금 마음이 절실히 필요로 한다는 뜻입니다.
+
+요즘 번아웃과 지친 마음을 안고 계신 맥락에서 이 꿈은 매우 의미 있는 메시지를 담고 있습니다. 한동안 떠올리지도 않던 분이 갑자기 나타나셨다는 점, 그리고 말씀이 잘 들리지 않으셨지만 손을 잡고 등을 토닥여 주셨다는 점은 마음 깊은 곳이 본인에게 무언의 위로를 건네고 있다는 의미입니다. 말이 들리지 않은 것은 '말로 표현되지 않는 위로'가 더 깊다는 뜻이고, 등을 토닥인 것은 "잘하고 있어, 괜찮아"라는 가장 본질적인 인정의 표현입니다. 베개가 젖었다는 디테일은 본인이 그동안 얼마나 많은 감정을 누르고 살아왔는지, 그리고 그 감정이 풀려나갈 출구가 필요했는지를 보여줍니다.
+
+앞으로 이렇게 해보시기를 권합니다. 첫째, 오늘 하루는 본인을 위해 '돌봄의 시간'을 의식적으로 만들어보세요. 평소보다 좋은 음식을 챙겨 드시거나, 따뜻한 차 한 잔을 천천히 마시거나, 좋아하는 음악을 틀어두는 작은 의식이 좋습니다. 둘째, 외할머니와의 추억이 담긴 장소를 한 번 다시 방문해보거나, 그게 어렵다면 사진을 꺼내보거나 어머니께 할머니 이야기를 청해보세요. 마음이 회복되는 가장 빠른 방법은 본인이 사랑받았던 기억을 다시 한 번 또렷이 체험하는 것입니다. 셋째, 본인의 한계를 인정하고 충분히 쉬어가는 결정을 내려보세요. 등을 토닥여 주신 그 손길은 "더 해라"가 아니라 "이제 좀 쉬어도 된다"는 허락의 메시지입니다.
+
+마지막으로 이 꿈이 보낸 가장 큰 선물을 받아들이세요. 본인은 혼자가 아닙니다. 보이지 않는 따뜻한 시선들이 본인을 지켜보고 있고, 본인 안에도 그 사랑의 기억이 여전히 살아 숨쉬고 있습니다. 그 기억이 지금의 본인을 충분히 받쳐줄 수 있다는 것을 오늘 꿈이 알려주고 있습니다.`,
+    comfort:'',lucky:['따뜻한 베이지색','남동쪽','숫자 3','늦은 오후']
+  },
+  {
+    id:4,theme:'sky',nickname:'도윤님',title:'하늘을 날다 모르는 사람을 봤어요',
+    badge:'✨ 길몽',badgeColor:'#5EC87A',badgeBg:'rgba(94,200,122,.12)',
+    snippet:'어젯밤 꿈에서 제가 하늘을 자유롭게 날고 있었어요. 처음에는 천천히 떠올랐는데...',
+    emotion:'💫 설렘/기대',lifeContext:'새로운 일을 시작할까 고민 중',
+    dream:'어젯밤 꿈에서 제가 하늘을 자유롭게 날고 있었어요. 처음에는 천천히 떠올랐는데 점점 빨라져서 구름 위를 지나갔어요. 무섭지 않았고 오히려 호흡이 깊어지면서 기분이 정말 좋았어요. 아래를 내려다보니 익숙한 동네가 보였고, 어느 순간 모르는 사람 한 명이 저 멀리서 손을 흔드는 게 보였어요. 그쪽으로 천천히 날아갔는데 거리가 좁혀지면서 깼어요. 그 사람이 누구였는지 얼굴은 기억나지 않지만 좋은 인상이 남아 있어요.',
+    matched:[
+      {symbol:'하늘을 나는 꿈',category:'행동',meaning:'자유·승진·해방의 길몽'},
+      {symbol:'구름 위를 지나감',category:'행동',meaning:'한 단계를 넘어서는 상승'},
+      {symbol:'모르는 사람의 손짓',category:'인물',meaning:'새로운 인연 또는 가능성의 부름'},
+      {symbol:'익숙한 동네를 내려다봄',category:'장소',meaning:'본인의 현재 위치를 새 시선으로 봄'}
+    ],
+    symbols:['자유로운 비행','구름 위 풍경','손짓하는 낯선 이'],
+    summary:'하늘을 자유롭게 날며 모르는 사람의 손짓을 향해 다가가는 꿈은 한국 전통 해몽에서 새로운 단계로의 도약과 새 인연을 동시에 상징합니다. 새로운 시작을 고민 중인 시점에 이 꿈을 꾼 것은 결코 우연이 아닙니다.',
+    detail:`하늘을 나는 꿈은 한국 전통 해몽에서 가장 보편적이면서도 가장 명확하게 길몽으로 분류되는 꿈입니다. 옛부터 이런 꿈은 '운이 트인다', '자유로워진다', '한 단계 올라간다'는 의미로 풀이되었습니다. 특히 도윤님의 꿈처럼 처음에는 천천히 떠오르다가 점점 빨라지는 움직임은 매우 좋은 징조로 해석됩니다. 이는 어떤 일의 시작이 처음에는 더디지만 시간이 지날수록 가속도가 붙어 큰 흐름이 만들어진다는 뜻입니다. 더불어 구름 위를 지나갔다는 디테일은 단순한 변화가 아니라 '한 차원을 넘어서는' 도약을 암시합니다.
+
+심리학적으로 보면 하늘을 나는 꿈은 '자유에 대한 깊은 욕구'와 '현재 상황에서 벗어나 더 넓은 시야를 갖고 싶다는 마음'이 표현되는 가장 강력한 방식입니다. 다만 도윤님의 꿈에서 중요한 점은 그 비행이 도피적이거나 무서운 게 아니라, 오히려 호흡이 깊어지고 기분이 좋아졌다는 것입니다. 이는 본인이 현재 상황에서 도망치려는 게 아니라, 진정으로 새로운 가능성을 향해 자연스럽게 끌리고 있다는 신호입니다. 마음 깊은 곳이 이미 본인이 다음 단계로 갈 준비가 되었음을 알리고 있는 셈입니다.
+
+꿈에 등장한 모르는 사람의 의미는 특히 흥미롭습니다. 한국 전통 해몽에서 모르는 사람이 손짓하며 본인을 부르는 장면은 '새로운 인연' 또는 '새로운 기회'의 상징으로 해석됩니다. 그 사람이 누구인지 얼굴이 기억나지 않지만 좋은 인상이 남아 있다는 점은 매우 중요합니다. 이는 다가올 인연이나 기회가 본인이 지금까지 만나본 적 없는 새로운 유형일 수 있음을 시사합니다. 또한 익숙한 동네를 위에서 내려다보았다는 장면은 본인의 현재 위치를 한 발 떨어져서 객관적으로 볼 수 있는 시야가 열렸다는 뜻이기도 합니다. 새로운 일을 시작할까 고민 중이라면, 이 꿈은 그 결정에 대한 매우 긍정적인 응원의 메시지입니다.
+
+앞으로 이렇게 행동해보시기를 권합니다. 첫째, 고민 중인 새로운 시작에 대해 이번 달 안에 첫 발을 떼는 작은 행동 하나를 정해보세요. 큰 결단이 아니어도 좋습니다. 사람을 한 명 만나거나, 자료를 정리하거나, 누군가에게 연락을 해보는 작은 시도가 꿈이 보낸 흐름과 가장 잘 맞습니다. 둘째, 평소 잘 가지 않던 모임이나 자리에 한 번 가보세요. 모르는 사람이 손짓한 장면은 새로운 환경에서 새로운 인연이 기다리고 있다는 강력한 암시입니다. 셋째, 본인이 평소 신뢰하는 직감을 평소보다 더 따라가 보세요. 이 시기의 첫 느낌은 평소보다 더 정확하며, 머리로 분석하기 전에 마음이 먼저 향하는 방향에 답이 있을 가능성이 높습니다.
+
+마지막으로 이 꿈의 가장 본질적인 메시지를 받아들이세요. 본인은 이미 날 수 있는 사람입니다. 꿈은 그 사실을 본인이 한 번 더 떠올리도록 보여주었습니다. 망설임의 무게를 내려놓고 한 걸음씩 움직이실 때, 이 꿈이 보여준 풍경은 현실에서 펼쳐지기 시작합니다.`,
+    comfort:'',lucky:['하늘색','동쪽','숫자 5','이른 오전']
+  }
+];
+
+async function saveAdminLog(log){try{await window.storage.set(`admin:log:${log.id}_${Math.random().toString(36).slice(2,7)}`,JSON.stringify(log),true)}catch(e){console.error(e)}}
+async function loadAllAdminLogs(){try{const res=await window.storage.list('admin:log:',true);if(!res||!res.keys||!res.keys.length)return [];const logs=[];for(const k of res.keys){try{const r=await window.storage.get(k,true);if(r&&r.value)logs.push(JSON.parse(r.value))}catch{}}return logs.sort((a,b)=>b.id-a.id)}catch{return []}}
+
+const starsEl=document.getElementById('stars');
+for(let i=0;i<80;i++){const s=document.createElement('div');s.className='star';const size=Math.random()*2.5+.5;s.style.cssText=`width:${size}px;height:${size}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${(Math.random()*4+2).toFixed(1)}s;animation-delay:${(Math.random()*4).toFixed(1)}s`;starsEl.appendChild(s)}
+
+let selectedEmotion='';
+let selectedEmotionCode='';
+let currentResult=null;
+let currentDream='';
+let currentLifeContext='';
+
+document.getElementById('dreamText').addEventListener('input',function(){document.getElementById('charCount').textContent=this.value.length});
+
+function insertExample(el,text){document.querySelectorAll('.option-chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');document.getElementById('dreamText').value=text;document.getElementById('charCount').textContent=text.length}
+function selectEmo(el,label,code){document.querySelectorAll('.emo-chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');selectedEmotion=label;selectedEmotionCode=code}
+function toggleOptional(){document.getElementById('optToggle').classList.toggle('open');document.getElementById('optContent').classList.toggle('open')}
+function show(id){['screen-input','screen-loading','screen-result'].forEach(s=>{document.getElementById(s).style.display=s===id?'block':'none'})}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+
+function goPage(pageId){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+
+  // 정책 페이지면 네비탭 모두 비활성화 + 푸터 숨김
+  const policyPages=['page-terms','page-privacy','page-refund','page-support'];
+  const isPolicyPage=policyPages.includes(pageId);
+  const footer=document.getElementById('appFooter');
+  if(footer)footer.style.display=isPolicyPage?'none':'block';
+
+  if(isPolicyPage){
+    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  }else{
+    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.toggle('active',t.dataset.page===pageId));
+  }
+
+  if(pageId==='page-samples')renderSamples();
+  if(pageId==='page-admin')renderAdmin();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function checkAdminRoute(){
+  if(location.hash==='#admin'){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById('page-admin').classList.add('active');
+    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+    renderAdmin();
+  }
+}
+window.addEventListener('hashchange',checkAdminRoute);
+checkAdminRoute();
+
+const loadingStages=['꿈에서 핵심 상징을 추출하는 중...','한국 전통 해몽 사전과 매칭하는 중...','꿈의 감정 흐름을 분석하는 중...','심리학적 의미를 통합하는 중...','맞춤 해석과 조언을 정리하는 중...'];
+
+async function startInterpretation(){
+  const dream=document.getElementById('dreamText').value.trim();
+  if(!dream||dream.length<10){showToast('꿈 내용을 조금 더 자세히 적어주세요 🌙');return}
+  const lifeContext=document.getElementById('lifeContext').value.trim();
+  currentDream=dream;
+  currentLifeContext=lifeContext;
+  show('screen-loading');
+  let stageIdx=0;
+  const stageEl=document.getElementById('loadingStage');
+  stageEl.textContent=loadingStages[0];
+  const stageInterval=setInterval(()=>{stageIdx=(stageIdx+1)%loadingStages.length;stageEl.style.opacity='0';setTimeout(()=>{stageEl.textContent=loadingStages[stageIdx];stageEl.style.opacity='1'},200)},2200);
+
+  const userPrompt=`다음 꿈을 위 지식 베이스에 근거해 해몽해주세요.
+
+[꿈 내용]
+${dream}
+${selectedEmotion?`\n[꿈에서 느낀 감정]\n${selectedEmotion}`:''}
+${lifeContext?`\n[요즘 신경 쓰이는 일]\n${lifeContext}`:''}
+
+시스템 지시에 따라 JSON 형식으로만 작성하세요.
+detail(심층 해석)은 반드시 1500자 이상 3000자 이하입니다.
+응답 본문에 학술 용어(HVDC, 융, 분석심리학, Self, Shadow, Anima 등)는 절대 노출 금지.`;
+
+  try{
+    const res=await fetch("/api/interpret",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:5000,
+        system:`당신은 30년 경력의 한국 전통 해몽 전문가입니다. 한국 전통 해몽과 심리학적 분석을 결합해 따뜻하고 깊이 있게 해석하세요.
+
+${KOREAN_DREAM_KB}
+
+[해석 절차]
+1. 꿈에서 매칭되는 핵심 상징 2~4개 식별
+2. 전통 의미 우선, 심리학적 풀이로 보강
+3. 사용자 감정과 요즘 고민 반영해 개인화
+4. 구체적 행동 조언 3가지 이상
+5. 흉몽이면 "옛 어른들이 액땜이라 부르던 꿈" 개념으로 위로
+
+[길이 제약 - 엄격]
+- detail(심층 해석): 반드시 1500자 이상 3000자 이하, 4~6문단, \\n\\n구분
+- summary: 100~150자
+- teaser: 80~120자 호기심 자극
+
+[사용자 노출 금지 표현]
+HVDC, 융, 융(Jung), 분석심리학, Self, Shadow, Anima, Animus, HA/AP/SD/CO/AN 등 영문 약어와 학술 용어 절대 금지.
+"심리학적으로 보면", "옛부터 전해지는 해석으로는", "마음 깊은 곳" 같은 자연어로 풀어쓸 것.
+
+[중요] 응답은 JSON만. 마크다운 코드블록 절대 금지.
+
+{
+  "gilhyung": "길몽"|"흉몽"|"보통",
+  "matched_symbols": [{"symbol":"상징명","category":"동물|자연|신체|인물|행동|장소","meaning":"이 꿈에서의 의미 (80자 이내)"}],
+  "symbols": ["핵심 상징 3개"],
+  "emotion_code": "AN|AP|SD|CO|HA",
+  "summary": "100~150자",
+  "teaser": "80~120자 호기심 자극",
+  "detail": "1500~3000자 4~6문단",
+  "comfort": "흉몽일 경우 위로 1문장. 아니면 빈 문자열",
+  "lucky": ["행운의 색","방향","숫자","시간대"]
+}`,
+        messages:[{role:"user",content:userPrompt}]
+      })
+    });
+
+    clearInterval(stageInterval);
+    if(!res.ok)throw new Error(`API 오류: ${res.status}`);
+    const data=await res.json();
+    const raw=data.content[0].text.trim();
+    let parsed;
+    try{parsed=JSON.parse(raw.replace(/```json|```/g,'').trim())}catch{throw new Error('응답 파싱 실패')}
+
+    const entryId=Date.now();
+    const adminLog={id:entryId,date:new Date().toISOString(),dream_preview:dream.slice(0,80)+(dream.length>80?'...':''),emotion_input:selectedEmotion,emotion_code_input:selectedEmotionCode,gilhyung:parsed.gilhyung,emotion_code:parsed.emotion_code,matched_symbols:(parsed.matched_symbols||[]).map(m=>({symbol:m.symbol,category:m.category}))};
+    await saveAdminLog(adminLog);
+
+    currentResult=parsed;
+    renderResult(parsed);
+  }catch(err){
+    clearInterval(stageInterval);
+    console.error(err);
+    showError(err.message);
+  }
+}
+
+function showError(msg){
+  document.getElementById('screen-result').innerHTML=`<div class="result"><div class="error-banner">⚠️ 해몽을 불러오지 못했습니다.<br><span style="font-size:.72rem;color:var(--muted)">오류: ${msg}</span></div><button class="btn-reset" onclick="reset()">↩ 다시 시도하기</button></div>`;
+  show('screen-result');
+}
+
+function renderResult(r){
+  const gilClass=r.gilhyung==='길몽'?'gil':r.gilhyung==='흉몽'?'hyung':'bo';
+  const gilEmoji=r.gilhyung==='길몽'?'✨':r.gilhyung==='흉몽'?'🌫️':'🌀';
+  const symbolsHTML=(r.symbols||[]).map(s=>`<span class="symbol-chip">◆ ${s}</span>`).join('');
+  const matchedHTML=(r.matched_symbols&&r.matched_symbols.length)?`<div class="matched-card"><div class="matched-title">참조된 전통 해몽 상징</div>${r.matched_symbols.map(m=>`<div class="matched-item"><div class="matched-symbol">◆ ${m.symbol}<span class="matched-category">[${m.category||'상징'}]</span></div><div class="matched-meaning">${m.meaning}</div></div>`).join('')}</div>`:'';
+  const comfortHTML=r.comfort?`<div class="comfort-card"><span class="comfort-icon">🤲</span><p class="comfort-text">${r.comfort}</p></div>`:'';
+  const detailParts=(r.detail||'').split(/\n\n/);
+  const visiblePart=detailParts[0]||'';
+  const teaserPart=r.teaser||'';
+  const blurredPart=detailParts.slice(1,3).join('\n\n');
+
+  // 사용자 꿈 내용 카드
+  const userMetaItems=[];
+  if(selectedEmotion)userMetaItems.push(selectedEmotion);
+  if(currentLifeContext)userMetaItems.push(`고민: ${currentLifeContext}`);
+  const userMetaHTML=userMetaItems.length?`<div class="user-dream-meta">${userMetaItems.map(m=>`<span class="user-meta-item">${m}</span>`).join('')}</div>`:'';
+
+  document.getElementById('screen-result').innerHTML=`
+<div class="result">
+  <div class="divider"><span>해몽 결과</span></div>
+
+  <div class="fortune-badge">
+    <span class="fortune-label">오늘의 꿈은</span>
+    <span class="fortune-value ${gilClass}">${gilEmoji} ${r.gilhyung}</span>
+  </div>
+
+  ${symbolsHTML?`<div class="symbols-row">${symbolsHTML}</div>`:''}
+
+  <div class="user-dream-card">
+    <div class="user-dream-label">내가 꾼 꿈</div>
+    <div class="user-dream-text">${currentDream.replace(/\n/g,'<br>')}</div>
+    ${userMetaHTML}
+  </div>
+
+  ${matchedHTML}
+
+  ${comfortHTML}
+
+  <div class="res-card">
+    <div class="res-card-title">핵심 의미</div>
+    <div class="res-card-body">${r.summary||''}</div>
+  </div>
+
+  <div class="teaser-card">
+    <div class="detail-card-header">
+      <div class="detail-card-badge"></div>
+      <div class="detail-card-title">심층 해석 · 행동 가이드</div>
+    </div>
+    <div class="teaser-visible">${visiblePart}</div>
+    <div class="teaser-italic">${teaserPart}</div>
+    <div class="teaser-blur-wrap">
+      <div class="teaser-blur">${blurredPart}</div>
+      <div class="teaser-fade"></div>
+      <button class="teaser-cta-inline" onclick="scrollToPaywall()">🔓 전체 보기</button>
+    </div>
+  </div>
+
+  <div id="paywallSection">
+    <div class="paywall-hook">
+      <span class="hook-icon">🌙</span>
+      <h2 class="hook-title">당신만 모르는 이야기가<br>아직 남아 있어요</h2>
+      <p class="hook-subtitle">꿈은 잊혀집니다. 메시지도 함께요.<br>오늘의 깊은 의미, 사라지기 전에 만나보세요.</p>
+      <div class="hook-divider"></div>
+      <div class="hook-features">
+        <span>✦ 1,500자+ 심층 해석</span>
+        <span>✦ 행동 가이드 3가지</span>
+        <span>✦ 행운 아이템 4종</span>
+      </div>
+    </div>
+
+    <div class="urgency-bar">오늘 꾼 꿈은 오늘만 정확하게 해석됩니다</div>
+
+    <button class="btn-pay" onclick="onPayClick()">🌙 &nbsp;₩1,990 — 전체 해몽 보기</button>
+
+    <div class="pay-trust">
+      안전한 결제 · 회원가입 없음 · 1회 결제
+      <div class="pay-trust-row">
+        <span class="pay-trust-item">🔒 토스페이먼츠</span>
+        <span class="pay-trust-item">💳 카드/계좌</span>
+        <span class="pay-trust-item">📱 카카오페이</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="share-row">
+    <button class="btn-share btn-share-primary" onclick="shareKakao()">💬 &nbsp;카카오톡 공유</button>
+    <button class="btn-share" onclick="downloadImage()">🖼 &nbsp;이미지 저장</button>
+    <button class="btn-share" onclick="copyResult()">📋 &nbsp;텍스트 복사</button>
+  </div>
+  <button class="btn-reset" onclick="reset()">↩ &nbsp;다른 꿈 해몽하기</button>
+
+  <p class="disclaimer">본 해몽은 재미와 영감을 위한 해석입니다.</p>
+</div>`;
+  show('screen-result');
+}
+
+function scrollToPaywall(){const el=document.getElementById('paywallSection');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}
+
+function onPayClick(){
+  showToast('결제 연동 예정 🌙 — 미리보기로 전체 해몽을 보여드릴게요');
+  setTimeout(()=>openFullModal(),800);
+}
+
+function openFullModal(){
+  if(!currentResult)return;
+  const r=currentResult;
+  const detailFormatted=(r.detail||'').split('\n\n').map(p=>`<p>${p}</p>`).join('');
+  const luckyHTML=(r.lucky||[]).map(l=>`<span class="lucky-tag">✦ ${l}</span>`).join('');
+  document.getElementById('modalContent').innerHTML=`
+    <div class="divider" style="margin-top:0"><span>전체 해몽</span></div>
+    <div class="detail-card-header" style="margin-bottom:1rem">
+      <div class="detail-card-badge"></div>
+      <div class="detail-card-title">심층 해석 · 행동 가이드</div>
+    </div>
+    <div class="detail-card-body">${detailFormatted}</div>
+    <div class="res-card" style="margin-top:1.2rem">
+      <div class="res-card-title">오늘의 행운 아이템</div>
+      <div class="lucky-row">${luckyHTML}</div>
+    </div>
+    <p class="disclaimer">본 해몽은 재미와 영감을 위한 해석입니다.</p>`;
+  document.getElementById('modalFull').classList.add('show');
+}
+function closeModal(){document.getElementById('modalFull').classList.remove('show')}
+
+function buildShareCard(r){
+  const gilColor=r.gilhyung==='길몽'?'#5EC87A':r.gilhyung==='흉몽'?'#E85A5A':'#C8963E';
+  const gilEmoji=r.gilhyung==='길몽'?'✨':r.gilhyung==='흉몽'?'🌫️':'🌀';
+  const symbolsHTML=(r.symbols||[]).slice(0,3).map(s=>`<span style="background:rgba(200,150,62,.15);color:#E8BC6A;padding:6px 14px;border-radius:20px;font-size:14px;border:1px solid rgba(200,150,62,.3);font-family:'Noto Serif KR',serif">◆ ${s}</span>`).join(' ');
+  return `<div style="background:linear-gradient(180deg,#0B0D1A 0%,#161930 100%);padding:36px 32px;border-radius:24px;border:2px solid rgba(200,150,62,.25);color:#F0E6CC;font-family:'Noto Sans KR',sans-serif"><div style="text-align:center;margin-bottom:24px"><div style="font-size:36px;margin-bottom:8px">🌙</div><div style="font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:#F0E6CC;letter-spacing:.05em">밤편지</div><div style="font-size:10px;color:#7A7590;letter-spacing:.15em;margin-top:3px">꿈이 보낸 편지</div></div><div style="border-top:1px solid rgba(200,150,62,.3);border-bottom:1px solid rgba(200,150,62,.3);padding:18px 0;margin-bottom:20px;text-align:center"><div style="font-size:11px;color:#7A7590;letter-spacing:.15em;margin-bottom:8px">오늘의 꿈은</div><div style="font-family:'Noto Serif KR',serif;font-size:28px;font-weight:700;color:${gilColor}">${gilEmoji} ${r.gilhyung}</div></div><div style="text-align:center;margin-bottom:24px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap">${symbolsHTML}</div><div style="background:#161930;border:1px solid rgba(200,150,62,.2);border-radius:14px;padding:20px;margin-bottom:20px"><div style="font-size:11px;color:#C8963E;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px">🌙 핵심 의미</div><div style="font-size:14px;line-height:1.85;color:#D8D0C4">${r.summary||''}</div></div><div style="text-align:center;padding-top:14px;border-top:1px solid rgba(200,150,62,.15)"><div style="font-size:12px;color:#C8963E;letter-spacing:.1em">전체 해몽 보기</div><div style="font-size:10px;color:#7A7590;margin-top:4px">밤편지에서 확인 →</div></div></div>`;
+}
+
+async function downloadImage(){
+  if(!currentResult)return;
+  showToast('이미지 생성 중...');
+  document.getElementById('shareCard').innerHTML=buildShareCard(currentResult);
+  const wrap=document.getElementById('shareCardWrap');
+  wrap.style.left='0';wrap.style.top='0';wrap.style.zIndex='-1';wrap.style.opacity='0';
+  try{
+    await new Promise(r=>setTimeout(r,300));
+    const canvas=await html2canvas(wrap,{backgroundColor:'#0B0D1A',scale:2,logging:false});
+    const link=document.createElement('a');
+    link.download=`밤편지_${new Date().toISOString().slice(0,10)}.png`;
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+    showToast('이미지가 저장됐어요! 🌙');
+  }catch(e){console.error(e);showToast('이미지 저장 실패')}finally{wrap.style.left='-9999px';wrap.style.top='-9999px'}
+}
+
+function shareKakao(){copyResult();setTimeout(()=>showToast('카카오톡에 붙여넣기 하세요!'),500)}
+
+function copyResult(){
+  if(!currentResult)return;
+  const r=currentResult;
+  const symbols=(r.symbols||[]).map(s=>`◆ ${s}`).join(' ');
+  const text=`🌙 밤편지 — 꿈이 보낸 편지\n\n오늘의 꿈은: ${r.gilhyung}\n\n${symbols}\n\n[핵심 의미]\n${r.summary}\n\n전체 해몽 보기 → 밤편지에서 확인하세요!`;
+  navigator.clipboard.writeText(text).then(()=>showToast('클립보드에 복사됐어요! 🌙')).catch(()=>showToast('복사 완료!'));
+}
+
+function reset(){
+  document.getElementById('dreamText').value='';
+  document.getElementById('charCount').textContent='0';
+  document.getElementById('lifeContext').value='';
+  selectedEmotion='';selectedEmotionCode='';currentResult=null;currentDream='';currentLifeContext='';
+  document.querySelectorAll('.option-chip,.emo-chip').forEach(c=>c.classList.remove('active'));
+  show('screen-input');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderSamples(){
+  const grid=document.getElementById('sampleGrid');
+  grid.innerHTML=SAMPLES.map(s=>`
+    <div class="sample-card theme-${s.theme}" onclick="openSampleDetail(${s.id})">
+      <div class="sample-card-head">
+        <span class="sample-nickname">${s.nickname}</span>
+        <span class="sample-badge" style="background:${s.badgeBg};color:${s.badgeColor};border:1px solid ${s.badgeColor}66">${s.badge}</span>
+      </div>
+      <div class="sample-title">${s.title}</div>
+      <div class="sample-snippet">${s.snippet}</div>
+      <div class="sample-meta">
+        <span class="sample-meta-item">${s.emotion}</span>
+        <span class="sample-meta-item">고민: ${s.lifeContext}</span>
+      </div>
+      <div class="sample-cta">
+        <span>전체 해몽 보기</span>
+        <span class="sample-cta-arrow">→</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openSampleDetail(id){
+  const s=SAMPLES.find(x=>x.id===id);
+  if(!s)return;
+  const matched=s.matched.map(m=>`<div class="matched-item"><div class="matched-symbol">◆ ${m.symbol}<span class="matched-category">[${m.category}]</span></div><div class="matched-meaning">${m.meaning}</div></div>`).join('');
+  const symbolsHTML=s.symbols.map(sym=>`<span class="symbol-chip">◆ ${sym}</span>`).join('');
+  const detailFormatted=s.detail.split('\n\n').map(p=>`<p>${p}</p>`).join('');
+  const luckyHTML=s.lucky.map(l=>`<span class="lucky-tag">✦ ${l}</span>`).join('');
+  const comfortHTML=s.comfort?`<div class="comfort-card"><span class="comfort-icon">🤲</span><p class="comfort-text">${s.comfort}</p></div>`:'';
+
+  document.getElementById('modalContent').innerHTML=`
+    <div class="divider" style="margin-top:0"><span>${s.nickname}의 꿈 해몽</span></div>
+
+    <div class="fortune-badge">
+      <span class="fortune-label">이 꿈은</span>
+      <span class="fortune-value" style="background:${s.badgeBg};color:${s.badgeColor};border:1px solid ${s.badgeColor}66">${s.badge}</span>
+    </div>
+
+    <div class="symbols-row">${symbolsHTML}</div>
+
+    <div class="user-dream-card">
+      <div class="user-dream-label">꿈 내용</div>
+      <div class="user-dream-text">${s.dream}</div>
+      <div class="user-dream-meta">
+        <span class="user-meta-item">${s.emotion}</span>
+        <span class="user-meta-item">고민: ${s.lifeContext}</span>
+      </div>
+    </div>
+
+    <div class="matched-card">
+      <div class="matched-title">참조된 전통 해몽 상징</div>
+      ${matched}
+    </div>
+
+    ${comfortHTML}
+
+    <div class="res-card">
+      <div class="res-card-title">핵심 의미</div>
+      <div class="res-card-body">${s.summary}</div>
+    </div>
+
+    <div class="detail-card">
+      <div class="detail-card-header">
+        <div class="detail-card-badge"></div>
+        <div class="detail-card-title">심층 해석 · 행동 가이드</div>
+      </div>
+      <div class="detail-card-body">${detailFormatted}</div>
+    </div>
+
+    <div class="res-card">
+      <div class="res-card-title">오늘의 행운 아이템</div>
+      <div class="lucky-row">${luckyHTML}</div>
+    </div>
+
+    <div style="background:linear-gradient(135deg,#1F1A40,#1A1830);border:1px solid rgba(200,150,62,.45);border-radius:16px;padding:1.6rem 1.4rem;text-align:center;margin-top:1.4rem">
+      <p style="font-family:'Noto Serif KR',serif;font-size:1.2rem;color:var(--moonlight);margin-bottom:.5rem;font-weight:600">내 꿈도 이렇게 받아보세요</p>
+      <p style="font-size:.88rem;color:var(--text-soft);line-height:1.75;margin-bottom:1.2rem;font-weight:300">본인 꿈을 입력하면<br>나만을 위한 맞춤 해석이 생성됩니다</p>
+      <button class="btn-main" onclick="closeModal();goPage('page-home')">🔮 내 꿈 해몽받기</button>
+    </div>
+
+    <p class="disclaimer" style="margin-top:1.2rem">본 해몽은 재미와 영감을 위한 해석입니다.</p>
+  `;
+  document.getElementById('modalFull').classList.add('show');
+}
+
+async function renderAdmin(){
+  const container=document.getElementById('adminContent');
+  container.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted)">데이터 로딩 중...</div>';
+  const logs=await loadAllAdminLogs();
+  if(!logs.length){container.innerHTML=`<div style="text-align:center;padding:2rem;color:var(--muted)">📊<br><br>아직 누적된 데이터가 없습니다.</div>`;return}
+  const total=logs.length;
+  const gilCount=logs.filter(l=>l.gilhyung==='길몽').length;
+  const hyungCount=logs.filter(l=>l.gilhyung==='흉몽').length;
+  const todayCount=logs.filter(l=>new Date(l.date).toDateString()===new Date().toDateString()).length;
+  const symbolFreq={};
+  logs.forEach(l=>(l.matched_symbols||[]).forEach(m=>{symbolFreq[m.symbol]=(symbolFreq[m.symbol]||0)+1}));
+  const topSymbols=Object.entries(symbolFreq).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const maxSymCount=topSymbols[0]?topSymbols[0][1]:1;
+  const emoFreq={AN:0,AP:0,SD:0,CO:0,HA:0};
+  logs.forEach(l=>{if(l.emotion_code&&emoFreq.hasOwnProperty(l.emotion_code))emoFreq[l.emotion_code]++});
+  const emoLabels={AN:'분노',AP:'불안',SD:'슬픔',CO:'혼란',HA:'행복'};
+  const maxEmo=Math.max(...Object.values(emoFreq),1);
+  const catFreq={};
+  logs.forEach(l=>(l.matched_symbols||[]).forEach(m=>{catFreq[m.category]=(catFreq[m.category]||0)+1}));
+  const recentLogs=logs.slice(0,20);
+  container.innerHTML=`
+    <div class="admin-stats">
+      <div class="stat-card"><div class="stat-label">총 해몽</div><div class="stat-value">${total}</div><div class="stat-sub">건</div></div>
+      <div class="stat-card"><div class="stat-label">오늘</div><div class="stat-value">${todayCount}</div><div class="stat-sub">건</div></div>
+      <div class="stat-card"><div class="stat-label">길몽</div><div class="stat-value" style="color:#5EC87A">${gilCount}</div><div class="stat-sub">${total?Math.round(gilCount/total*100):0}%</div></div>
+      <div class="stat-card"><div class="stat-label">흉몽</div><div class="stat-value" style="color:#E85A5A">${hyungCount}</div><div class="stat-sub">${total?Math.round(hyungCount/total*100):0}%</div></div>
+    </div>
+    <div class="admin-section">
+      <div class="admin-section-title">자주 등장하는 상징 TOP 10</div>
+      ${topSymbols.length?topSymbols.map((s,i)=>`<div class="ranking-row"><span class="ranking-num">${i+1}</span><span class="ranking-name">${s[0]}</span><div class="ranking-bar-wrap"><div class="ranking-bar" style="width:${s[1]/maxSymCount*100}%"></div></div><span class="ranking-count">${s[1]}회</span></div>`).join(''):'<div style="color:var(--muted);font-size:.8rem;text-align:center;padding:1rem">데이터 부족</div>'}
+    </div>
+    <div class="admin-section">
+      <div class="admin-section-title">감정 분포</div>
+      ${Object.entries(emoFreq).map(([k,v])=>`<div class="ranking-row"><span class="ranking-name">${emoLabels[k]}</span><div class="ranking-bar-wrap"><div class="ranking-bar" style="width:${v/maxEmo*100}%"></div></div><span class="ranking-count">${v}회</span></div>`).join('')}
+    </div>
+    <div class="admin-section">
+      <div class="admin-section-title">카테고리별 분포</div>
+      ${Object.entries(catFreq).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="ranking-row"><span class="ranking-name">${k||'미분류'}</span><div class="ranking-bar-wrap"><div class="ranking-bar" style="width:${v/Math.max(...Object.values(catFreq))*100}%"></div></div><span class="ranking-count">${v}회</span></div>`).join('')}
+    </div>
+    <div class="admin-section">
+      <div class="admin-section-title">최근 해몽 로그 (최대 20건)</div>
+      ${recentLogs.map(l=>`<div class="log-row"><div class="log-meta"><span>${new Date(l.date).toLocaleString('ko-KR')}</span><span style="color:${l.gilhyung==='길몽'?'#5EC87A':l.gilhyung==='흉몽'?'#E85A5A':'#C8963E'}">${l.gilhyung}</span><span>${l.emotion_code||''}</span></div><div class="log-content">${l.dream_preview}</div>${l.matched_symbols&&l.matched_symbols.length?`<div style="margin-top:.3rem;font-size:.7rem;color:var(--gold-light)">매칭: ${l.matched_symbols.map(m=>m.symbol).join(', ')}</div>`:''}</div>`).join('')}
+    </div>
+    <button class="btn-admin-action" onclick="exportAdminData()">📥 전체 데이터 JSON 다운로드</button>
+  `;
+}
+
+async function exportAdminData(){
+  const logs=await loadAllAdminLogs();
+  const blob=new Blob([JSON.stringify(logs,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`dream_admin_logs_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();URL.revokeObjectURL(url);
+  showToast('데이터를 다운로드했어요 📥');
+}
+</script>
+</body>
+</html>
