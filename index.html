@@ -610,6 +610,29 @@ textarea::placeholder{color:var(--muted);font-size:.88rem;line-height:1.75;font-
   white-space:nowrap;transition:all .2s;
 }
 .share-link-copy:hover{background:rgba(200,150,62,.25)}
+
+/* 공유 페이지의 "절반만 보임" 안내 카드 */
+.half-letter-card{
+  background:linear-gradient(135deg,rgba(74,63,122,.25),rgba(31,26,64,.4));
+  border:1px solid rgba(144,128,208,.4);
+  border-left:3px solid #9080D0;
+  border-radius:14px;padding:1.3rem 1.4rem;margin-bottom:1rem;
+  position:relative;
+}
+.half-letter-icon{
+  font-size:1.4rem;margin-bottom:.6rem;display:block;
+}
+.half-letter-title{
+  font-family:'Noto Serif KR',serif;font-size:1rem;
+  color:#D8C8F0;font-weight:600;margin-bottom:.7rem;line-height:1.5;
+}
+.half-letter-body{
+  font-size:.85rem;color:var(--text-soft);line-height:1.85;
+  font-weight:300;
+}
+.half-letter-body .accent{
+  color:#C4B5E0;font-weight:500;
+}
 </style>
 </head>
 <body>
@@ -1336,6 +1359,16 @@ function renderSharedDream(data){
       <div class="res-card-body">${data.summary||''}</div>
     </div>
 
+    <div class="half-letter-card">
+      <span class="half-letter-icon">💌</span>
+      <div class="half-letter-title">친구가 받은 편지의 절반만 보이고 있어요</div>
+      <div class="half-letter-body">
+        꿈 속에 숨겨진 진짜 메시지와 행동 가이드는
+        <span class="accent">받은 사람만이 열어볼 수 있는 사적인 영역</span>이에요.<br>
+        당신의 꿈은 어떤 편지를 받게 될까요?
+      </div>
+    </div>
+
     <div class="shared-cta-card">
       <span class="shared-cta-emoji">🌙</span>
       <h2 class="shared-cta-title">내 꿈도 받아보세요</h2>
@@ -1381,7 +1414,7 @@ detail(심층 해석)은 반드시 1500자 이상 3000자 이하입니다.
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
-        model:"claude-sonnet-4-5",
+        model:"claude-sonnet-4-20250514",
         max_tokens:5000,
         system:`당신은 30년 경력의 한국 전통 해몽 전문가입니다. 한국 전통 해몽과 심리학적 분석을 결합해 따뜻하고 깊이 있게 해석하세요.
 
