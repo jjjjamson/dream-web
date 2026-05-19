@@ -1,0 +1,8 @@
+{
+  "name": "bamletter",
+  "version": "1.0.0",
+  "description": "밤편지 - 꿈이 보낸 편지",
+  "dependencies": {
+    "redis": "^4.7.0"
+  }
+}

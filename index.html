@@ -553,6 +553,63 @@ textarea::placeholder{color:var(--muted);font-size:.88rem;line-height:1.75;font-
   transition:all .2s;
 }
 .btn-back:hover{background:rgba(200,150,62,.08)}
+
+/* ===== 공유 페이지 (받는 사람용) ===== */
+.shared-header{
+  background:linear-gradient(135deg,#2A1F50,#1F1A40);
+  border:1px solid rgba(112,96,176,.4);
+  border-radius:16px;padding:1.5rem 1.4rem;margin-bottom:1.2rem;
+  text-align:center;box-shadow:0 4px 20px rgba(112,96,176,.15);
+}
+.shared-from{
+  font-size:.78rem;color:#C4B5E0;letter-spacing:.05em;margin-bottom:.5rem;
+}
+.shared-title{
+  font-family:'Noto Serif KR',serif;font-size:1.2rem;
+  color:var(--moonlight);font-weight:700;line-height:1.5;margin-bottom:.4rem;
+}
+.shared-subtitle{
+  font-size:.78rem;color:#9080D0;letter-spacing:.03em;line-height:1.5;
+}
+.shared-cta-card{
+  background:linear-gradient(135deg,#1F1A40 0%,#1A1530 100%);
+  border:1.5px solid rgba(200,150,62,.5);
+  border-radius:16px;padding:1.8rem 1.4rem;margin-top:1.5rem;
+  text-align:center;position:relative;overflow:hidden;
+  box-shadow:0 0 40px rgba(200,150,62,.1);
+}
+.shared-cta-card::before{
+  content:'';position:absolute;top:-60px;left:50%;
+  transform:translateX(-50%);width:220px;height:120px;
+  background:radial-gradient(ellipse,rgba(200,150,62,.3),transparent 70%);
+  pointer-events:none;
+}
+.shared-cta-emoji{font-size:2rem;margin-bottom:.6rem;display:block;position:relative}
+.shared-cta-title{
+  font-family:'Noto Serif KR',serif;font-size:1.25rem;
+  color:var(--moonlight);font-weight:700;margin-bottom:.6rem;
+  position:relative;line-height:1.45;
+}
+.shared-cta-sub{
+  font-size:.88rem;color:var(--gold-light);line-height:1.7;
+  margin-bottom:1.3rem;position:relative;font-weight:300;
+}
+.share-link-box{
+  background:rgba(11,13,26,.5);border:1px solid rgba(200,150,62,.3);
+  border-radius:10px;padding:.8rem 1rem;margin-top:1rem;
+  display:flex;align-items:center;gap:.6rem;
+}
+.share-link-text{
+  flex:1;font-size:.78rem;color:var(--text-soft);
+  font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.share-link-copy{
+  background:rgba(200,150,62,.15);border:1px solid rgba(200,150,62,.4);
+  color:var(--gold);padding:.35rem .8rem;border-radius:6px;
+  font-size:.75rem;cursor:pointer;font-family:'Noto Sans KR',sans-serif;
+  white-space:nowrap;transition:all .2s;
+}
+.share-link-copy:hover{background:rgba(200,150,62,.25)}
 </style>
 </head>
 <body>
@@ -670,6 +727,22 @@ textarea::placeholder{color:var(--muted);font-size:.88rem;line-height:1.75;font-
     </div>
 
     <div class="footer-disclaimer">위 사례들은 본 서비스의 실제 해석 품질을 보여주는 샘플입니다.</div>
+  </div>
+
+  <!-- ============ 공유받은 해몽 페이지 ============ -->
+  <div class="page" id="page-shared">
+    <header>
+      <span class="logo-symbol">💌</span>
+      <h1>밤편지</h1>
+      <p class="subtitle">친구가 받은 해몽</p>
+    </header>
+
+    <div id="sharedContent">
+      <div style="text-align:center;padding:3rem 1rem;color:var(--muted)">
+        <div class="loading-orb" style="margin-bottom:1rem"></div>
+        <p>해몽을 불러오는 중...</p>
+      </div>
+    </div>
   </div>
 
   <!-- ============ 관리자 ============ -->
@@ -957,7 +1030,7 @@ textarea::placeholder{color:var(--muted);font-size:.88rem;line-height:1.75;font-
 
       </div>
     </div>
-    </div>
+  </div>
   <!-- ===== 공통 푸터 ===== -->
   <footer class="app-footer" id="appFooter" style="display:block">
     <div class="app-footer-brand">밤편지</div>
@@ -985,7 +1058,7 @@ textarea::placeholder{color:var(--muted);font-size:.88rem;line-height:1.75;font-
   </div>
 </div>
 
-<div id="shareCardWrap" style="position:fixed;top:-9999px;left:-9999px;width:480px;background:#0B0D1A;padding:2.2rem 1.8rem;font-family:'Noto Sans KR',sans-serif">
+<div id="shareCardWrap" style="position:fixed;top:-9999px;left:-9999px;width:480px;background:#0B0D1A;padding:2.2rem 1.8rem;font-family:'Noto Sans KR',sans-serif;visibility:hidden;opacity:0">
   <div id="shareCard"></div>
 </div>
 
@@ -1167,11 +1240,115 @@ function checkAdminRoute(){
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
     document.getElementById('page-admin').classList.add('active');
     document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+    const footer=document.getElementById('appFooter');
+    if(footer)footer.style.display='none';
     renderAdmin();
   }
 }
 window.addEventListener('hashchange',checkAdminRoute);
 checkAdminRoute();
+
+// ===== 공유 라우팅 =====
+// URL 파라미터 ?share=xxxxxxxx 감지하여 공유 페이지 표시
+function checkShareRoute(){
+  const params=new URLSearchParams(location.search);
+  const shareId=params.get('share');
+  if(shareId&&/^[a-z0-9]{8}$/.test(shareId)){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById('page-shared').classList.add('active');
+    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+    const footer=document.getElementById('appFooter');
+    if(footer)footer.style.display='block';
+    loadSharedDream(shareId);
+    return true;
+  }
+  return false;
+}
+
+async function loadSharedDream(shareId){
+  const container=document.getElementById('sharedContent');
+  try{
+    const res=await fetch(`/api/share/get?id=${encodeURIComponent(shareId)}`);
+    if(!res.ok){
+      if(res.status===404){
+        container.innerHTML=`
+          <div style="text-align:center;padding:3rem 1rem">
+            <div style="font-size:3rem;margin-bottom:1rem;opacity:.5">🌫️</div>
+            <p style="font-size:.95rem;color:var(--text);margin-bottom:.5rem">해당 해몽을 찾을 수 없어요</p>
+            <p style="font-size:.78rem;color:var(--muted);line-height:1.7;margin-bottom:2rem">공유 링크가 만료되었거나 잘못된 주소일 수 있어요.<br>밤편지 홈으로 가서 직접 해몽을 받아보세요.</p>
+            <button class="btn-main" onclick="goPage('page-home')">🔮 내 꿈 해몽받기</button>
+          </div>`;
+        return;
+      }
+      throw new Error('서버 오류');
+    }
+    const data=await res.json();
+    renderSharedDream(data);
+  }catch(err){
+    console.error(err);
+    container.innerHTML=`
+      <div style="text-align:center;padding:3rem 1rem">
+        <p style="font-size:.9rem;color:var(--text)">해몽을 불러오지 못했어요</p>
+        <button class="btn-main" style="margin-top:1.5rem" onclick="goPage('page-home')">🔮 내 꿈 해몽받기</button>
+      </div>`;
+  }
+}
+
+function renderSharedDream(data){
+  const gilClass=data.gilhyung==='길몽'?'gil':data.gilhyung==='흉몽'?'hyung':'bo';
+  const gilEmoji=data.gilhyung==='길몽'?'✨':data.gilhyung==='흉몽'?'🌫️':'🌀';
+  const symbolsHTML=(data.symbols||[]).map(s=>`<span class="symbol-chip">◆ ${s}</span>`).join('');
+  const matchedHTML=(data.matched_symbols&&data.matched_symbols.length)?`
+    <div class="matched-card">
+      <div class="matched-title">참조된 전통 해몽 상징</div>
+      ${data.matched_symbols.map(m=>`<div class="matched-item"><div class="matched-symbol">◆ ${m.symbol}<span class="matched-category">[${m.category||'상징'}]</span></div><div class="matched-meaning">${m.meaning||''}</div></div>`).join('')}
+    </div>`:'';
+
+  const userMetaItems=[];
+  if(data.emotion)userMetaItems.push(data.emotion);
+  if(data.lifeContext)userMetaItems.push(`고민: ${data.lifeContext}`);
+  const userMetaHTML=userMetaItems.length?`<div class="user-dream-meta">${userMetaItems.map(m=>`<span class="user-meta-item">${m}</span>`).join('')}</div>`:'';
+
+  document.getElementById('sharedContent').innerHTML=`
+    <div class="shared-header">
+      <div class="shared-from">💌 친구가 보낸 해몽</div>
+      <div class="shared-title">친구가 받은 해몽이에요</div>
+      <div class="shared-subtitle">내 꿈은 어떻게 풀이될지 궁금하다면<br>아래에서 직접 받아보세요</div>
+    </div>
+
+    <div class="fortune-badge">
+      <span class="fortune-label">이 꿈은</span>
+      <span class="fortune-value ${gilClass}">${gilEmoji} ${data.gilhyung}</span>
+    </div>
+
+    ${symbolsHTML?`<div class="symbols-row">${symbolsHTML}</div>`:''}
+
+    <div class="user-dream-card">
+      <div class="user-dream-label">꿈 내용</div>
+      <div class="user-dream-text">${(data.dream||'').replace(/\n/g,'<br>')}</div>
+      ${userMetaHTML}
+    </div>
+
+    ${matchedHTML}
+
+    <div class="res-card">
+      <div class="res-card-title">핵심 의미</div>
+      <div class="res-card-body">${data.summary||''}</div>
+    </div>
+
+    <div class="shared-cta-card">
+      <span class="shared-cta-emoji">🌙</span>
+      <h2 class="shared-cta-title">내 꿈도 받아보세요</h2>
+      <p class="shared-cta-sub">밤편지가 보낸 편지는<br>당신의 꿈에도 도착할 수 있어요</p>
+      <button class="btn-main" onclick="goPage('page-home')">🔮 내 꿈 해몽받기</button>
+    </div>
+
+    <p class="disclaimer" style="margin-top:1.5rem">본 해몽은 재미와 영감을 위한 해석입니다.</p>
+  `;
+}
+
+// 페이지 첫 로드 시 공유 라우팅 체크
+checkShareRoute();
 
 const loadingStages=['꿈에서 핵심 상징을 추출하는 중...','한국 전통 해몽 사전과 매칭하는 중...','꿈의 감정 흐름을 분석하는 중...','심리학적 의미를 통합하는 중...','맞춤 해석과 조언을 정리하는 중...'];
 
@@ -1181,6 +1358,7 @@ async function startInterpretation(){
   const lifeContext=document.getElementById('lifeContext').value.trim();
   currentDream=dream;
   currentLifeContext=lifeContext;
+  currentShareUrl=''; // 새 해몽 시작 시 이전 공유 URL 캐시 초기화
   show('screen-loading');
   let stageIdx=0;
   const stageEl=document.getElementById('loadingStage');
@@ -1203,7 +1381,7 @@ detail(심층 해석)은 반드시 1500자 이상 3000자 이하입니다.
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
-        model:"claude-sonnet-4-5",
+        model:"claude-sonnet-4-20250514",
         max_tokens:5000,
         system:`당신은 30년 경력의 한국 전통 해몽 전문가입니다. 한국 전통 해몽과 심리학적 분석을 결합해 따뜻하고 깊이 있게 해석하세요.
 
@@ -1391,38 +1569,137 @@ function openFullModal(){
 }
 function closeModal(){document.getElementById('modalFull').classList.remove('show')}
 
-function buildShareCard(r){
+function buildShareCard(r,shareUrl){
   const gilColor=r.gilhyung==='길몽'?'#5EC87A':r.gilhyung==='흉몽'?'#E85A5A':'#C8963E';
   const gilEmoji=r.gilhyung==='길몽'?'✨':r.gilhyung==='흉몽'?'🌫️':'🌀';
-  const symbolsHTML=(r.symbols||[]).slice(0,3).map(s=>`<span style="background:rgba(200,150,62,.15);color:#E8BC6A;padding:6px 14px;border-radius:20px;font-size:14px;border:1px solid rgba(200,150,62,.3);font-family:'Noto Serif KR',serif">◆ ${s}</span>`).join(' ');
-  return `<div style="background:linear-gradient(180deg,#0B0D1A 0%,#161930 100%);padding:36px 32px;border-radius:24px;border:2px solid rgba(200,150,62,.25);color:#F0E6CC;font-family:'Noto Sans KR',sans-serif"><div style="text-align:center;margin-bottom:24px"><div style="font-size:36px;margin-bottom:8px">🌙</div><div style="font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:#F0E6CC;letter-spacing:.05em">밤편지</div><div style="font-size:10px;color:#7A7590;letter-spacing:.15em;margin-top:3px">꿈이 보낸 편지</div></div><div style="border-top:1px solid rgba(200,150,62,.3);border-bottom:1px solid rgba(200,150,62,.3);padding:18px 0;margin-bottom:20px;text-align:center"><div style="font-size:11px;color:#7A7590;letter-spacing:.15em;margin-bottom:8px">오늘의 꿈은</div><div style="font-family:'Noto Serif KR',serif;font-size:28px;font-weight:700;color:${gilColor}">${gilEmoji} ${r.gilhyung}</div></div><div style="text-align:center;margin-bottom:24px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap">${symbolsHTML}</div><div style="background:#161930;border:1px solid rgba(200,150,62,.2);border-radius:14px;padding:20px;margin-bottom:20px"><div style="font-size:11px;color:#C8963E;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px">🌙 핵심 의미</div><div style="font-size:14px;line-height:1.85;color:#D8D0C4">${r.summary||''}</div></div><div style="text-align:center;padding-top:14px;border-top:1px solid rgba(200,150,62,.15)"><div style="font-size:12px;color:#C8963E;letter-spacing:.1em">전체 해몽 보기</div><div style="font-size:10px;color:#7A7590;margin-top:4px">밤편지에서 확인 →</div></div></div>`;
+  const symbolsHTML=(r.symbols||[]).slice(0,3).map(s=>`<span style="background:rgba(200,150,62,.15);color:#E8BC6A;padding:6px 14px;border-radius:20px;font-size:14px;border:1px solid rgba(200,150,62,.3);font-family:'Noto Serif KR',serif;display:inline-block">◆ ${s}</span>`).join(' ');
+  // URL이 너무 길면 줄임
+  const displayUrl=shareUrl?shareUrl.replace(/^https?:\/\//,''):'밤편지에서 확인하세요';
+  const urlBlock=shareUrl?`<div style="background:rgba(200,150,62,.08);border:1px dashed rgba(200,150,62,.35);border-radius:10px;padding:14px 16px;text-align:center;margin-top:16px"><div style="font-size:10px;color:#C8963E;letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px">전체 결과 보기</div><div style="font-size:13px;color:#E8BC6A;font-family:monospace;word-break:break-all">${displayUrl}</div></div>`:'';
+  return `<div style="background:linear-gradient(180deg,#0B0D1A 0%,#161930 100%);padding:36px 32px;border-radius:24px;border:2px solid rgba(200,150,62,.25);color:#F0E6CC;font-family:'Noto Sans KR',sans-serif">
+<div style="text-align:center;margin-bottom:24px">
+  <div style="font-size:36px;margin-bottom:8px">🌙</div>
+  <div style="font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:#F0E6CC;letter-spacing:.05em">밤편지</div>
+  <div style="font-size:10px;color:#7A7590;letter-spacing:.15em;margin-top:3px">꿈이 보낸 편지</div>
+</div>
+<div style="border-top:1px solid rgba(200,150,62,.3);border-bottom:1px solid rgba(200,150,62,.3);padding:18px 0;margin-bottom:20px;text-align:center">
+  <div style="font-size:11px;color:#7A7590;letter-spacing:.15em;margin-bottom:8px">오늘의 꿈은</div>
+  <div style="font-family:'Noto Serif KR',serif;font-size:28px;font-weight:700;color:${gilColor}">${gilEmoji} ${r.gilhyung}</div>
+</div>
+<div style="text-align:center;margin-bottom:20px">${symbolsHTML}</div>
+<div style="background:#161930;border:1px solid rgba(200,150,62,.2);border-radius:14px;padding:20px;margin-bottom:8px">
+  <div style="font-size:11px;color:#C8963E;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px">🌙 핵심 의미</div>
+  <div style="font-size:14px;line-height:1.85;color:#D8D0C4">${r.summary||''}</div>
+</div>
+${urlBlock}
+</div>`;
+}
+
+// ===== 공유 URL 생성 =====
+// 결제 전 공개 부분만 서버에 저장하고 짧은 URL을 반환
+// 한 번 생성되면 currentShareUrl에 캐시됨 (같은 결과 재공유 시 재사용)
+let currentShareUrl='';
+
+async function getOrCreateShareUrl(){
+  if(currentShareUrl)return currentShareUrl;
+  if(!currentResult)return '';
+  try{
+    const res=await fetch('/api/share/create',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        dream:currentDream,
+        result:currentResult,
+        emotion:selectedEmotion,
+        lifeContext:currentLifeContext
+      })
+    });
+    if(!res.ok)throw new Error('공유 링크 생성 실패');
+    const data=await res.json();
+    currentShareUrl=`${location.origin}/?share=${data.id}`;
+    return currentShareUrl;
+  }catch(e){
+    console.error('공유 URL 생성 오류:',e);
+    return '';
+  }
 }
 
 async function downloadImage(){
   if(!currentResult)return;
   showToast('이미지 생성 중...');
-  document.getElementById('shareCard').innerHTML=buildShareCard(currentResult);
+  // 공유 URL이 없으면 먼저 생성
+  if(!currentShareUrl)await getOrCreateShareUrl();
+  document.getElementById('shareCard').innerHTML=buildShareCard(currentResult,currentShareUrl);
   const wrap=document.getElementById('shareCardWrap');
-  wrap.style.left='0';wrap.style.top='0';wrap.style.zIndex='-1';wrap.style.opacity='0';
+  // 화면에 잠시 노출시켜 html2canvas가 정확히 캡처할 수 있도록
+  wrap.style.left='0';wrap.style.top='0';wrap.style.zIndex='-1';wrap.style.opacity='1';
+  wrap.style.visibility='visible';
   try{
-    await new Promise(r=>setTimeout(r,300));
-    const canvas=await html2canvas(wrap,{backgroundColor:'#0B0D1A',scale:2,logging:false});
+    // 폰트 + 레이아웃 안정화 대기
+    await new Promise(r=>setTimeout(r,600));
+    await document.fonts.ready;
+    const canvas=await html2canvas(wrap,{
+      backgroundColor:'#0B0D1A',
+      scale:2,
+      logging:false,
+      useCORS:true,
+      allowTaint:true,
+      windowWidth:480
+    });
     const link=document.createElement('a');
     link.download=`밤편지_${new Date().toISOString().slice(0,10)}.png`;
     link.href=canvas.toDataURL('image/png');
     link.click();
-    showToast('이미지가 저장됐어요! 🌙');
-  }catch(e){console.error(e);showToast('이미지 저장 실패')}finally{wrap.style.left='-9999px';wrap.style.top='-9999px'}
+    showToast('이미지가 저장됐어요 🌙');
+  }catch(e){
+    console.error('이미지 저장 오류:',e);
+    showToast('이미지 저장 실패. 다시 시도해주세요');
+  }finally{
+    wrap.style.left='-9999px';
+    wrap.style.top='-9999px';
+    wrap.style.opacity='0';
+    wrap.style.visibility='hidden';
+  }
 }
 
-function shareKakao(){copyResult();setTimeout(()=>showToast('카카오톡에 붙여넣기 하세요!'),500)}
-
-function copyResult(){
+async function shareKakao(){
   if(!currentResult)return;
+  showToast('공유 링크 생성 중...');
+  const url=await getOrCreateShareUrl();
+  if(!url){showToast('공유 링크 생성 실패. 다시 시도해주세요');return}
+  const r=currentResult;
+  const text=`🌙 밤편지 — 꿈이 보낸 편지\n\n오늘 받은 해몽: ${r.gilhyung}\n\n${r.summary}\n\n👇 결과 보기\n${url}`;
+  try{
+    await navigator.clipboard.writeText(text);
+    showToast('카카오톡에 붙여넣기 하세요! 💬');
+  }catch{
+    showToast('링크가 복사됐어요! 카카오톡에 붙여넣기 하세요');
+  }
+}
+
+async function copyResult(){
+  if(!currentResult)return;
+  showToast('공유 링크 생성 중...');
+  const url=await getOrCreateShareUrl();
   const r=currentResult;
   const symbols=(r.symbols||[]).map(s=>`◆ ${s}`).join(' ');
-  const text=`🌙 밤편지 — 꿈이 보낸 편지\n\n오늘의 꿈은: ${r.gilhyung}\n\n${symbols}\n\n[핵심 의미]\n${r.summary}\n\n전체 해몽 보기 → 밤편지에서 확인하세요!`;
-  navigator.clipboard.writeText(text).then(()=>showToast('클립보드에 복사됐어요! 🌙')).catch(()=>showToast('복사 완료!'));
+  const text=`🌙 밤편지 — 꿈이 보낸 편지\n\n오늘의 꿈은: ${r.gilhyung}\n\n${symbols}\n\n[핵심 의미]\n${r.summary}\n\n${url?`전체 결과 보기:\n${url}`:'밤편지에서 확인하세요'}`;
+  try{
+    await navigator.clipboard.writeText(text);
+    showToast('클립보드에 복사됐어요! 🌙');
+  }catch{
+    showToast('복사 완료!');
+  }
+}
+
+async function copyShareLinkOnly(){
+  if(!currentResult)return;
+  const url=await getOrCreateShareUrl();
+  if(!url){showToast('링크 생성 실패');return}
+  try{
+    await navigator.clipboard.writeText(url);
+    showToast('공유 링크가 복사됐어요 🔗');
+  }catch{showToast('복사 실패')}
 }
 
 function reset(){
@@ -1430,6 +1707,7 @@ function reset(){
   document.getElementById('charCount').textContent='0';
   document.getElementById('lifeContext').value='';
   selectedEmotion='';selectedEmotionCode='';currentResult=null;currentDream='';currentLifeContext='';
+  currentShareUrl='';
   document.querySelectorAll('.option-chip,.emo-chip').forEach(c=>c.classList.remove('active'));
   show('screen-input');
   window.scrollTo({top:0,behavior:'smooth'});
