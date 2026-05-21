@@ -83,6 +83,33 @@ h1{
   letter-spacing:.02em;font-weight:400;
 }
 
+/* ===== BETA 배지 (정식 출시 시 제거) ===== */
+.beta-banner{
+  display:inline-flex;align-items:center;gap:.4rem;
+  margin-top:.85rem;padding:5px 12px;
+  background:linear-gradient(135deg,rgba(112,96,176,.25),rgba(74,63,122,.25));
+  border:1px solid rgba(144,128,208,.5);
+  border-radius:14px;
+  font-size:.7rem;color:#C4B5E0;
+  letter-spacing:.04em;font-weight:500;
+}
+.beta-banner-icon{font-size:.8rem}
+
+/* 푸터의 피드백 링크 */
+.app-footer-feedback{
+  display:inline-block;margin-top:.85rem;
+  font-size:.74rem;color:#9080D0;
+  text-decoration:none;cursor:pointer;
+  padding:5px 12px;border:1px solid rgba(144,128,208,.4);
+  border-radius:14px;
+  transition:all .2s;font-family:'Noto Sans KR',sans-serif;
+  background:none;
+}
+.app-footer-feedback:hover{
+  background:rgba(144,128,208,.1);
+  color:#C4B5E0;
+}
+
 /* ===== 구분선 ===== */
 .divider{display:flex;align-items:center;gap:14px;margin:1.6rem 0}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:linear-gradient(to right,transparent,rgba(200,150,62,.3),transparent)}
@@ -659,6 +686,7 @@ textarea::placeholder{color:var(--muted);font-size:.88rem;line-height:1.75;font-
         <span class="cred-tag">한국 전통 해몽</span>
         <span class="cred-tag">심리학적 분석</span>
       </div>
+      <div><span class="beta-banner"><span class="beta-banner-icon">🎁</span>BETA — 모든 해석 무료</span></div>
     </header>
 
     <div id="screen-input">
@@ -1066,6 +1094,7 @@ textarea::placeholder{color:var(--muted);font-size:.88rem;line-height:1.75;font-
       <span class="app-footer-divider">·</span>
       <button class="app-footer-link" onclick="goPage('page-support')">고객센터</button>
     </div>
+    <div><a class="app-footer-feedback" href="mailto:qkrwoals92@naver.com?subject=%5B%EB%B0%A4%ED%8E%B8%EC%A7%80%20%EB%B2%A0%ED%83%80%5D%20%EC%9D%98%EA%B2%AC%20%EB%B3%B4%EB%82%B4%EA%B8%B0&body=%EB%B0%A4%ED%8E%B8%EC%A7%80%EB%A5%BC%20%EC%9D%B4%EC%9A%A9%ED%95%B4%EC%A3%BC%EC%85%94%EC%84%9C%20%EA%B0%90%EC%82%AC%ED%95%A9%EB%8B%88%EB%8B%A4!%0D%0A%0D%0A%EA%B0%9C%EC%84%A0%ED%95%98%EB%A9%B4%20%EC%A2%8B%EC%9D%84%20%EC%A0%90%EC%9D%B4%EB%82%98%20%EC%9D%98%EA%B2%AC%EC%9D%84%20%EC%9E%90%EC%9C%A0%EB%A1%AD%EA%B2%8C%20%EB%82%A8%EA%B2%A8%EC%A3%BC%EC%84%B8%EC%9A%94.%0D%0A">💌 베타 의견 보내기</a></div>
     <div class="app-footer-copy">© 2026 밤편지. All rights reserved.</div>
   </footer>
 
@@ -1222,11 +1251,26 @@ async function loadAllAdminLogs(){try{const res=await window.storage.list('admin
 const starsEl=document.getElementById('stars');
 for(let i=0;i<80;i++){const s=document.createElement('div');s.className='star';const size=Math.random()*2.5+.5;s.style.cssText=`width:${size}px;height:${size}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${(Math.random()*4+2).toFixed(1)}s;animation-delay:${(Math.random()*4).toFixed(1)}s`;starsEl.appendChild(s)}
 
+// ===== 베타 모드 스위치 =====
+// 정식 출시 시 이 값을 false 로 변경하면 결제 모드로 자동 전환됩니다.
+// 변경 시 영향 받는 요소:
+//   - 헤더의 "🎁 BETA — 모든 해석 무료" 배지 자동 숨김
+//   - 페이월 버튼 카피 "🎁 무료로 잠금해제" → "🌙 ₩1,990 — 전체 해몽 보기"
+//   - onPayClick 동작 (베타: 즉시 모달 / 정식: 결제 위젯)
+const BETA_MODE=true;
+
 let selectedEmotion='';
 let selectedEmotionCode='';
 let currentResult=null;
 let currentDream='';
 let currentLifeContext='';
+
+// 베타 모드 자동 적용 (페이지 로드 후)
+if(!BETA_MODE){
+  // 정식 모드: BETA 배지 숨김
+  document.querySelectorAll('.beta-banner').forEach(el=>el.parentElement.style.display='none');
+  document.querySelectorAll('.app-footer-feedback').forEach(el=>el.parentElement.style.display='none');
+}
 
 document.getElementById('dreamText').addEventListener('input',function(){document.getElementById('charCount').textContent=this.value.length});
 
@@ -1547,18 +1591,7 @@ function renderResult(r){
       </div>
     </div>
 
-    <div class="urgency-bar">오늘 꾼 꿈은 오늘만 정확하게 해석됩니다</div>
-
-    <button class="btn-pay" onclick="onPayClick()">🌙 &nbsp;₩1,990 — 전체 해몽 보기</button>
-
-    <div class="pay-trust">
-      안전한 결제 · 회원가입 없음 · 1회 결제
-      <div class="pay-trust-row">
-        <span class="pay-trust-item">🔒 토스페이먼츠</span>
-        <span class="pay-trust-item">💳 카드/계좌</span>
-        <span class="pay-trust-item">📱 카카오페이</span>
-      </div>
-    </div>
+    <button class="btn-pay" onclick="onPayClick()">${BETA_MODE?'🎁 &nbsp;무료로 잠금해제':'🌙 &nbsp;₩1,990 — 전체 해몽 보기'}</button>
   </div>
 
   <div class="share-row">
@@ -1576,8 +1609,15 @@ function renderResult(r){
 function scrollToPaywall(){const el=document.getElementById('paywallSection');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}
 
 function onPayClick(){
-  showToast('결제 연동 예정 🌙 — 미리보기로 전체 해몽을 보여드릴게요');
-  setTimeout(()=>openFullModal(),800);
+  if(BETA_MODE){
+    // 베타 기간: 결제 없이 즉시 잠금해제
+    showToast('🎁 베타 기간 무료 잠금해제!');
+    setTimeout(()=>openFullModal(),400);
+  }else{
+    // 정식 모드: 결제 위젯 호출 (추후 토스페이먼츠 연동 시 구현)
+    showToast('결제 위젯 준비 중...');
+    // TODO: 토스페이먼츠 결제위젯 호출
+  }
 }
 
 function openFullModal(){
