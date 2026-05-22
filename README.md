@@ -6,55 +6,51 @@
 
 현재 베타 기간으로 모든 해석이 무료로 제공됩니다.
 
-### 정식 출시 시 결제 모드 전환 방법
+### 정식 출시 시 결제 모드 전환
 
-`index.html` 상단의 다음 한 줄만 변경:
+`index.html` 상단의 `const BETA_MODE = true;` → `false` 로 변경
 
-```javascript
-const BETA_MODE = true;   // → false 로 변경
-```
-
-자동으로 적용되는 변경사항:
-- 헤더의 "🎁 BETA — 모든 해석 무료" 배지 자동 숨김
-- 페이월 버튼: "🎁 무료로 잠금해제" → "🌙 ₩1,990 — 전체 해몽 보기"
-- 푸터의 "💌 베타 의견 보내기" 링크 자동 숨김
-- onPayClick() 동작: 즉시 모달 → 결제 위젯 호출 (구현 시점에 추가)
+자동 변경: BETA 배지 숨김, 페이월 카피, 피드백 링크 숨김
 
 ## 구조
 
 ```
 bamletter/
-├── index.html              사용자 화면
-├── package.json            의존성 (redis)
-├── api/
-│   ├── interpret.js        Anthropic API 호출
-│   └── share/
-│       ├── create.js       공유 링크 생성
-│       └── get.js          공유 링크 조회
+├── index.html              메인 화면
+├── package.json            의존성
+├── manifest.json           PWA 매니페스트
+├── og-image.png            카톡/SNS 미리보기 (1200x630)
+├── favicon.svg/.png        브라우저 + 모바일 아이콘
+├── apple-touch-icon.png    iOS 홈화면 아이콘
 ├── robots.txt
+├── api/
+│   ├── interpret.js
+│   └── share/
+│       ├── create.js
+│       └── get.js
 └── README.md
 ```
 
 ## 환경변수
 
-| 변수명 | 용도 |
-|---|---|
-| `ANTHROPIC_API_KEY` | Anthropic API 호출 |
-| `REDIS_URL` | 공유 데이터 저장 (Vercel Storage 자동 설정) |
+- `ANTHROPIC_API_KEY` : Anthropic API
+- `REDIS_URL` : Vercel Storage 자동 설정
+
+## SEO & 공유
+
+- Open Graph 태그 → 카톡, 페북, 라인 미리보기
+- Twitter Card → X 미리보기
+- Favicon → 브라우저/모바일
+- PWA Manifest → 홈 화면 추가
+
+**카톡 미리보기 캐시 우회**: 첫 공유 시 URL 뒤에 `?v=1` 추가
 
 ## 라우팅
 
-- `https://bamletter.kr/` — 메인
-- `https://bamletter.kr/?share=xxxxxxxx` — 공유받은 해몽
-- `https://bamletter.kr/#admin` — 관리자 대시보드
+- `/` 메인
+- `/?share=xxx` 공유받은 해몽
+- `/#admin` 관리자
 
-## 베타 사용자 피드백
+## 피드백
 
-푸터의 "💌 베타 의견 보내기" 클릭 시 `qkrwoals92@naver.com` 으로 mailto.
-
-## 비용
-
-- Vercel: 무료
-- Anthropic API: 1회 해몽 약 ₩70
-- Redis: 무료 (30MB)
-- 도메인: bamletter.kr (가비아)
+푸터 "💌 베타 의견 보내기" → 구글 폼
