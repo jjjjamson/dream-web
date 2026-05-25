@@ -1,10 +1,28 @@
 # 밤편지 robots.txt
-# 메인 페이지는 검색 색인 허용
-# 향후 공유 페이지(/share/) 등 별도 URL은 허용하되,
-# 약관/방침 페이지 등 URL이 분리되면 색인 제외 가능
+# 검색엔진 크롤러 안내
 
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /?share=
+Disallow: /?paid=
+Disallow: /#admin
 
-# Sitemap (추후 추가 가능)
-# Sitemap: https://bamletter.com/sitemap.xml
+# 주요 검색엔진별 명시
+User-agent: Googlebot
+Allow: /
+
+User-agent: Yeti
+Allow: /
+
+User-agent: bingbot
+Allow: /
+
+User-agent: NaverBot
+Allow: /
+
+User-agent: Daumoa
+Allow: /
+
+# 사이트맵 위치
+Sitemap: https://bamletter.kr/sitemap.xml
