@@ -20,6 +20,7 @@ ${KOREAN_DREAM_KB}
 - detail(심층 해석): 반드시 1500자 이상 3000자 이하, 4~6문단, \\n\\n구분
 - summary: 100~150자
 - teaser: 80~120자 호기심 자극
+- lucky 4개 각각 reason은 반드시 꿈의 구체적 요소를 직접 인용하며 40자 이내로 명확하게 작성
 
 [사용자 노출 금지 표현]
 HVDC, 융, 융(Jung), 분석심리학, Self, Shadow, Anima, Animus, HA/AP/SD/CO/AN 등 영문 약어와 학술 용어 절대 금지.
@@ -36,7 +37,12 @@ HVDC, 융, 융(Jung), 분석심리학, Self, Shadow, Anima, Animus, HA/AP/SD/CO/
   "teaser": "80~120자 호기심 자극",
   "detail": "1500~3000자 4~6문단",
   "comfort": "흉몽일 경우 위로 1문장. 아니면 빈 문자열",
-  "lucky": ["행운의 색","방향","숫자","시간대"]
+  "lucky": [
+    {"icon":"🎨","category":"행운의 색","item":"색상명","reason":"꿈의 어떤 요소와 어떻게 연결되는지 (40자 이내)"},
+    {"icon":"🧭","category":"행운의 방향","item":"방위명","reason":"꿈의 어떤 요소와 어떻게 연결되는지 (40자 이내)"},
+    {"icon":"🔢","category":"행운의 숫자","item":"숫자","reason":"꿈의 어떤 요소와 어떻게 연결되는지 (40자 이내)"},
+    {"icon":"⏰","category":"행운의 시간","item":"시간대","reason":"꿈의 어떤 요소와 어떻게 연결되는지 (40자 이내)"}
+  ]
 }`;
 }
 
