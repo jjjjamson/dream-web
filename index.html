@@ -1980,15 +1980,32 @@ async function shareKakao(){
   const url=await getOrCreateShareUrl();
   if(!url){showToast('공유 링크 생성 실패. 다시 시도해주세요');return}
   const r=currentResult;
-  const text=`🌙 밤편지 — 꿈이 보낸 편지\n\n오늘 받은 해몽: ${r.gilhyung}\n\n${r.summary}\n\n👇 결과 보기\n${url}`;
+  const title='🌙 밤편지 — 꿈이 보낸 편지';
+  const text=`오늘 받은 해몽: ${r.gilhyung}\n\n${r.summary}`;
+ 
+  // 1순위: Web Share API (모바일에서 OS 공유 시트 호출, 카톡/인스타/SMS 등 모두 가능)
+  if(navigator.share){
+    try{
+      await navigator.share({title, text, url});
+      // 공유 시트 떴음, 성공 처리 안 함 (사용자가 취소했을 수도 있음)
+      return;
+    }catch(err){
+      // 사용자가 공유 시트 취소한 경우 - 조용히 종료
+      if(err.name==='AbortError')return;
+      // 그 외 오류는 폴백으로
+      console.warn('Web Share API 실패, 폴백 진행:', err);
+    }
+  }
+  // 2순위: 클립보드 복사 (PC 또는 Web Share 미지원 환경)
+  const shareText=`${title}\n\n${text}\n\n👇 결과 보기\n${url}`;
   try{
-    await navigator.clipboard.writeText(text);
-    showToast('카카오톡에 붙여넣기 하세요! 💬');
+    await navigator.clipboard.writeText(shareText);
+    showToast('💬 카카오톡에 붙여넣기 하세요!');
   }catch{
-    showToast('링크가 복사됐어요! 카카오톡에 붙여넣기 하세요');
+    showToast('링크 복사 실패. 직접 복사해주세요');
   }
 }
-
+  
 async function copyResult(){
   if(!currentResult)return;
   showToast('공유 링크 생성 중...');
