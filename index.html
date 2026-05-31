@@ -1643,8 +1643,18 @@ const res=await fetch("/api/interpret",{
     const data=await res.json();
     const raw=data.content[0].text.trim();
     let parsed;
-    try{parsed=JSON.parse(raw.replace(/```json|```/g,'').trim())}catch{throw new Error('응답 파싱 실패')}
-
+try{
+  let cleanRaw=raw.replace(/```json|```/g,'').trim();
+  // 잘린 JSON 복구 시도: 마지막 } 또는 ] 까지만 살리기
+  const lastBrace=Math.max(cleanRaw.lastIndexOf('}'),cleanRaw.lastIndexOf(']'));
+  if(lastBrace>0&&lastBrace<cleanRaw.length-1){
+    cleanRaw=cleanRaw.substring(0,lastBrace+1);
+  }
+  parsed=JSON.parse(cleanRaw);
+}catch(parseErr){
+  console.error('JSON 파싱 실패. 원본 응답 끝부분:',raw.slice(-200));
+  throw new Error('응답 파싱 실패. 다시 시도해주세요.');
+}
     const entryId=Date.now();
     const adminLog={id:entryId,date:new Date().toISOString(),dream_preview:dream.slice(0,80)+(dream.length>80?'...':''),emotion_input:selectedEmotion,emotion_code_input:selectedEmotionCode,gilhyung:parsed.gilhyung,emotion_code:parsed.emotion_code,matched_symbols:(parsed.matched_symbols||[]).map(m=>({symbol:m.symbol,category:m.category}))};
     await saveAdminLog(adminLog);
