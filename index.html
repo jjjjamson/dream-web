@@ -1637,13 +1637,15 @@ detail(심층 해석)은 반드시 1500자 이상 3000자 이하입니다.
 응답 본문에 학술 용어(HVDC, 융, 분석심리학, Self, Shadow, Anima 등)는 절대 노출 금지.`;
 
   try{
-    const res=await fetch("/api/interpret",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        model:"claude-sonnet-4-6",
-        max_tokens:16000,
-        system:`당신은 30년 경력의 한국 전통 해몽 전문가입니다. 한국 전통 해몽과 심리학적 분석을 결합해 따뜻하고 깊이 있게 해석하세요.
+const res=await fetch("/api/interpret",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({
+    dream: dream,
+    emotion: selectedEmotion,
+    lifeContext: lifeContext
+  })
+});
 
 ${KOREAN_DREAM_KB}
 
