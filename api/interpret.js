@@ -97,7 +97,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 16000,
+        max_tokens: 32000,
         system: systemPrompt,
         messages: [
           { role: 'user', content: userMessage }
@@ -113,8 +113,23 @@ export default async function handler(req, res) {
       });
     }
 
-    const data = await response.json();
-    return res.status(200).json(data);
+const data = await response.json();
+
+// 응답 텍스트 추출 + 마크다운 코드펜스 제거 (방어 코드)
+if (data.content && data.content[0] && data.content[0].text) {
+  data.content[0].text = data.content[0].text
+    .replace(/^```json\s*/i, '')
+    .replace(/^```\s*/i, '')
+    .replace(/\s*```$/i, '')
+    .trim();
+}
+
+// 잘림 발생 시 로그 (디버깅용)
+if (data.stop_reason === 'max_tokens') {
+  console.warn('응답이 max_tokens에 도달했습니다. 출력 잘림 가능성.');
+}
+
+return res.status(200).json(data);
 
   } catch (err) {
     console.error('서버 오류:', err);
