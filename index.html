@@ -462,6 +462,14 @@ textarea::placeholder{color:var(--muted);font-size:.88rem;line-height:1.75;font-
   border-radius:20px;padding:.35rem .9rem;font-size:.82rem;
   color:var(--gold-light);font-weight:400;
 }
+  .lucky-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-top:.6rem}
+@media(max-width:480px){.lucky-grid{grid-template-columns:1fr 1fr;gap:.55rem}}
+  .lucky-card{background:linear-gradient(135deg,rgba(200,150,62,.08),rgba(200,150,62,.03));border:1px solid rgba(200,150,62,.25);border-radius:12px;padding:.85rem .8rem;display:flex;flex-direction:column;gap:.35rem;transition:all .2s}
+  .lucky-card:hover{border-color:rgba(200,150,62,.45);background:linear-gradient(135deg,rgba(200,150,62,.12),rgba(200,150,62,.05))}
+  .lucky-card-icon{font-size:1.5rem;line-height:1}
+  .lucky-card-category{font-size:.7rem;color:var(--muted);letter-spacing:.04em;font-weight:400}
+  .lucky-card-item{font-family:'Noto Serif KR',serif;font-size:1rem;color:var(--gold-light);font-weight:600;letter-spacing:.01em}
+  .lucky-card-reason{font-size:.72rem;color:var(--text-soft);line-height:1.55;font-weight:300;margin-top:.15rem}
 
 /* 페이월 */
 .paywall-hook{
@@ -1248,7 +1256,12 @@ const SAMPLES = [
 앞으로 이렇게 행동해보시기를 권합니다. 첫째, 지금 고민 중인 이직 결정에 대해 더 이상 정보를 모으며 미루지 마세요. 마음은 이미 답을 알고 있고 그 방향을 향해 가라고 말하고 있습니다. 이번 주 안에 결단을 내리시는 것이 흐름과 가장 잘 맞습니다. 둘째, 결정 후 한 달 안에 본인이 평소 만나지 않던 사람과의 자리를 한 번 만들어보세요. 황금뱀이 손목에 감겼다는 것은 단순한 재물뿐 아니라 '귀인(貴人)'과의 만남도 함께 의미합니다. 셋째, 이 꿈을 꾼 시점부터 약 3개월 이내에 들어오는 제안에 평소보다 더 열린 마음으로 응답해보세요. 평소 같으면 거절했을 작은 기회 안에 진짜 행운이 숨어 있을 가능성이 큽니다.
 
 마지막으로 기억해주세요. 길몽은 보장이 아니라 가능성입니다. 황금뱀이 손목을 감았다는 것은 운이 본인에게 '도착'했다는 뜻이지, 가만히 있어도 모든 것이 풀린다는 뜻은 아닙니다. 꿈이 보낸 신호를 본인의 행동으로 이어가실 때, 이 길몽은 비로소 완성됩니다.`,
-    comfort:'',lucky:['황금색','동쪽','숫자 8','이른 아침']
+comfort:'',lucky:[
+      {icon:'🎨',category:'행운의 색',item:'황금색',reason:'꿈에 등장한 황금구렁이의 빛이 재물을 상징'},
+      {icon:'🧭',category:'행운의 방향',item:'동쪽',reason:'쏟아진 햇빛의 방향, 양기와 성공의 도래'},
+      {icon:'🔢',category:'행운의 숫자',item:'8',reason:'재물·풍요를 뜻하는 전통 길수, 황금뱀과 공명'},
+      {icon:'⏰',category:'행운의 시간',item:'이른 아침',reason:'새벽에 꾼 꿈, 햇빛이 들어온 그 시간의 기운'}
+    ]
   },
   {
     id:2,theme:'hyung',nickname:'준호님',title:'이가 우두둑 빠지는 꿈을 꿨어요',
@@ -1272,8 +1285,14 @@ const SAMPLES = [
 앞으로 이렇게 행동해보시기를 권합니다. 첫째, 이번 주 안에 부모님께 한 번 전화를 드리거나 직접 안부를 묻는 시간을 가져보세요. 꿈이 알려준 마음속 걱정은 행동으로 해소될 때 가장 빨리 가라앉습니다. 둘째, 부모님의 정기검진이나 건강 점검이 미뤄져 있다면 이번 달 안에 일정을 잡아보세요. 꿈은 종종 우리가 미루어둔 일을 떠올리게 해주는 역할을 하는데, 이 꿈도 그런 알림일 가능성이 큽니다. 셋째, 본인의 마음도 함께 돌보세요. 가족 걱정에 빠져 정작 본인이 충분히 쉬지 못하고 있다면, 이 꿈은 본인에게도 "조금 쉬어가라"는 메시지를 보내고 있습니다.
 
 무엇보다 기억해주세요. 흉몽이라 불리는 꿈은 실제로는 본인을 보호하는 꿈인 경우가 훨씬 많습니다. 꿈은 본인의 적이 아니라, 본인 안의 가장 지혜로운 부분이 보내는 편지입니다. 오늘 꾼 이 꿈은 두려워해야 할 신호가 아니라, 사랑하는 사람을 한 번 더 떠올리고 챙기라는 다정한 알림일 가능성이 가장 큽니다.`,
+
     comfort:'옛 어른들은 이런 꿈을 두고 "액땜했다"며 오히려 안심하셨답니다. 마음이 미리 걱정을 흘려보내고 있다는 좋은 신호예요.',
-    lucky:['짙은 남색','북쪽','숫자 7','해 질 무렵']
+    lucky:[
+      {icon:'🎨',category:'행운의 색',item:'짙은 남색',reason:'마음을 안정시키고 걱정을 가라앉히는 색'},
+      {icon:'🧭',category:'행운의 방향',item:'북쪽',reason:'가족과의 연결을 강화하는 방향'},
+      {icon:'🔢',category:'행운의 숫자',item:'7',reason:'액땜·정화를 상징하는 전통 길수'},
+      {icon:'⏰',category:'행운의 시간',item:'해 질 무렵',reason:'하루의 걱정을 정리하기 좋은 시간'}
+    ]
   },
   {
     id:3,theme:'warm',nickname:'수진님',title:'돌아가신 외할머니께서 콩국수를 주셨어요',
@@ -1298,7 +1317,12 @@ const SAMPLES = [
 앞으로 이렇게 해보시기를 권합니다. 첫째, 오늘 하루는 본인을 위해 '돌봄의 시간'을 의식적으로 만들어보세요. 평소보다 좋은 음식을 챙겨 드시거나, 따뜻한 차 한 잔을 천천히 마시거나, 좋아하는 음악을 틀어두는 작은 의식이 좋습니다. 둘째, 외할머니와의 추억이 담긴 장소를 한 번 다시 방문해보거나, 그게 어렵다면 사진을 꺼내보거나 어머니께 할머니 이야기를 청해보세요. 마음이 회복되는 가장 빠른 방법은 본인이 사랑받았던 기억을 다시 한 번 또렷이 체험하는 것입니다. 셋째, 본인의 한계를 인정하고 충분히 쉬어가는 결정을 내려보세요. 등을 토닥여 주신 그 손길은 "더 해라"가 아니라 "이제 좀 쉬어도 된다"는 허락의 메시지입니다.
 
 마지막으로 이 꿈이 보낸 가장 큰 선물을 받아들이세요. 본인은 혼자가 아닙니다. 보이지 않는 따뜻한 시선들이 본인을 지켜보고 있고, 본인 안에도 그 사랑의 기억이 여전히 살아 숨쉬고 있습니다. 그 기억이 지금의 본인을 충분히 받쳐줄 수 있다는 것을 오늘 꿈이 알려주고 있습니다.`,
-    comfort:'',lucky:['따뜻한 베이지색','남동쪽','숫자 3','늦은 오후']
+    comfort:'',lucky:[
+      {icon:'🎨',category:'행운의 색',item:'따뜻한 베이지색',reason:'할머니의 마루와 콩국수의 색감, 위안의 빛깔'},
+      {icon:'🧭',category:'행운의 방향',item:'남동쪽',reason:'추억의 시골집이 위치한 방향, 정서적 안정'},
+      {icon:'🔢',category:'행운의 숫자',item:'3',reason:'할머니의 토닥임 3번, 위로와 회복의 숫자'},
+      {icon:'⏰',category:'행운의 시간',item:'늦은 오후',reason:'마루에 햇빛이 비치던 그 시간의 따뜻함'}
+    ]
   },
   {
     id:4,theme:'sky',nickname:'도윤님',title:'하늘을 날다 모르는 사람을 봤어요',
@@ -1323,8 +1347,12 @@ const SAMPLES = [
 앞으로 이렇게 행동해보시기를 권합니다. 첫째, 고민 중인 새로운 시작에 대해 이번 달 안에 첫 발을 떼는 작은 행동 하나를 정해보세요. 큰 결단이 아니어도 좋습니다. 사람을 한 명 만나거나, 자료를 정리하거나, 누군가에게 연락을 해보는 작은 시도가 꿈이 보낸 흐름과 가장 잘 맞습니다. 둘째, 평소 잘 가지 않던 모임이나 자리에 한 번 가보세요. 모르는 사람이 손짓한 장면은 새로운 환경에서 새로운 인연이 기다리고 있다는 강력한 암시입니다. 셋째, 본인이 평소 신뢰하는 직감을 평소보다 더 따라가 보세요. 이 시기의 첫 느낌은 평소보다 더 정확하며, 머리로 분석하기 전에 마음이 먼저 향하는 방향에 답이 있을 가능성이 높습니다.
 
 마지막으로 이 꿈의 가장 본질적인 메시지를 받아들이세요. 본인은 이미 날 수 있는 사람입니다. 꿈은 그 사실을 본인이 한 번 더 떠올리도록 보여주었습니다. 망설임의 무게를 내려놓고 한 걸음씩 움직이실 때, 이 꿈이 보여준 풍경은 현실에서 펼쳐지기 시작합니다.`,
-    comfort:'',lucky:['하늘색','동쪽','숫자 5','이른 오전']
-  }
+    comfort:'',lucky:[
+      {icon:'🎨',category:'행운의 색',item:'하늘색',reason:'꿈속 하늘과 구름의 색, 자유와 가능성'},
+      {icon:'🧭',category:'행운의 방향',item:'동쪽',reason:'모르는 사람이 손짓한 방향, 새 인연의 도래'},
+      {icon:'🔢',category:'행운의 숫자',item:'5',reason:'변화와 도약을 상징하는 길수'},
+      {icon:'⏰',category:'행운의 시간',item:'이른 오전',reason:'호흡이 깊어진 그 비행의 시작 시간'}
+    ]  }
 ];
 
 async function saveAdminLog(log){try{await window.storage.set(`admin:log:${log.id}_${Math.random().toString(36).slice(2,7)}`,JSON.stringify(log),true)}catch(e){console.error(e)}}
@@ -1815,12 +1843,27 @@ function closePaymentModal(){
   if(overlay) overlay.remove();
 }
 
+  function renderLucky(lucky){
+  if(!lucky||!lucky.length)return '';
+  // 구버전(문자열 배열) 호환: 단순 문자열이면 기존 태그 방식 사용
+  if(typeof lucky[0]==='string'){
+    return `<div class="lucky-row">${lucky.map(l=>`<span class="lucky-tag">✦ ${l}</span>`).join('')}</div>`;
+  }
+  // 신버전(객체 배열): 카드 그리드
+  return `<div class="lucky-grid">${lucky.map(l=>`
+    <div class="lucky-card">
+      <div class="lucky-card-icon">${l.icon||'✦'}</div>
+      <div class="lucky-card-category">${l.category||''}</div>
+      <div class="lucky-card-item">${l.item||''}</div>
+      <div class="lucky-card-reason">${l.reason||''}</div>
+    </div>`).join('')}</div>`;
+}
 
 function openFullModal(){
   if(!currentResult)return;
   const r=currentResult;
   const detailFormatted=(r.detail||'').split('\n\n').map(p=>`<p>${p}</p>`).join('');
-  const luckyHTML=(r.lucky||[]).map(l=>`<span class="lucky-tag">✦ ${l}</span>`).join('');
+const luckyHTML=renderLucky(r.lucky);
   document.getElementById('modalContent').innerHTML=`
     <div class="divider" style="margin-top:0"><span>전체 해몽</span></div>
     <div class="detail-card-header" style="margin-bottom:1rem">
@@ -1830,7 +1873,8 @@ function openFullModal(){
     <div class="detail-card-body">${detailFormatted}</div>
     <div class="res-card" style="margin-top:1.2rem">
       <div class="res-card-title">오늘의 행운 아이템</div>
-      <div class="lucky-row">${luckyHTML}</div>
+      <p style="font-size:.7rem;color:var(--muted);margin:.15rem 0 .3rem;line-height:1.5">꿈 속 상징을 바탕으로 한 오늘의 가이드</p>
+      ${luckyHTML}
     </div>
     <p class="disclaimer">본 해몽은 재미와 영감을 위한 해석입니다.</p>`;
   document.getElementById('modalFull').classList.add('show');
@@ -2009,7 +2053,7 @@ function openSampleDetail(id){
   const matched=s.matched.map(m=>`<div class="matched-item"><div class="matched-symbol">◆ ${m.symbol}<span class="matched-category">[${m.category}]</span></div><div class="matched-meaning">${m.meaning}</div></div>`).join('');
   const symbolsHTML=s.symbols.map(sym=>`<span class="symbol-chip">◆ ${sym}</span>`).join('');
   const detailFormatted=s.detail.split('\n\n').map(p=>`<p>${p}</p>`).join('');
-  const luckyHTML=s.lucky.map(l=>`<span class="lucky-tag">✦ ${l}</span>`).join('');
+  const luckyHTML=renderLucky(s.lucky);
   const comfortHTML=s.comfort?`<div class="comfort-card"><span class="comfort-icon">🤲</span><p class="comfort-text">${s.comfort}</p></div>`:'';
 
   document.getElementById('modalContent').innerHTML=`
@@ -2053,9 +2097,10 @@ function openSampleDetail(id){
 
     <div class="res-card">
       <div class="res-card-title">오늘의 행운 아이템</div>
-      <div class="lucky-row">${luckyHTML}</div>
+      <p style="font-size:.7rem;color:var(--muted);margin:.15rem 0 .3rem;line-height:1.5">꿈 속 상징을 바탕으로 한 오늘의 가이드</p>
+      ${luckyHTML}
     </div>
-
+    
     <div style="background:linear-gradient(135deg,#1F1A40,#1A1830);border:1px solid rgba(200,150,62,.45);border-radius:16px;padding:1.6rem 1.4rem;text-align:center;margin-top:1.4rem">
       <p style="font-family:'Noto Serif KR',serif;font-size:1.2rem;color:var(--moonlight);margin-bottom:.5rem;font-weight:600">내 꿈도 이렇게 받아보세요</p>
       <p style="font-size:.88rem;color:var(--text-soft);line-height:1.75;margin-bottom:1.2rem;font-weight:300">본인 꿈을 입력하면<br>나만을 위한 맞춤 해석이 생성됩니다</p>
